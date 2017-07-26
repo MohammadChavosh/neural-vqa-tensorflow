@@ -34,8 +34,9 @@ def load_image_features(img_path, graph, images):
 def main():
 	graph, images = get_vgg_graph()
 	print load_image_features('Data/train2014/COCO_train2014_000000465294.jpg', graph, images)
+	print load_image_features('Data/train2014/COCO_train2014_000000465294.jpg', graph, images)
+	print load_image_features('Data/train2014/COCO_train2014_000000465294.jpg', graph, images)
 
-	tf.reset_default_graph()
 	g1 = tf.Graph()
 	with g1.as_default() as g:
 		with g.name_scope("g1"):
@@ -45,6 +46,7 @@ def main():
 
 	with tf.Session( graph = g1 ) as sess:
 		print sess.run(product)
+
 	print load_image_features('Data/train2014/COCO_train2014_000000465294.jpg', graph, images)
 
 
