@@ -77,8 +77,8 @@ def main():
 		fc7_batch = sess.run(fc7_tensor, feed_dict = feed_dict)
 		fc7[(idx - count):idx, :] = fc7_batch[0:count,:]
 		end = time.clock()
-		print "Time for batch 10 photos", end - start
-		print "Hours For Whole Dataset" , (len(image_id_list) * 1.0)*(end - start)/60.0/60.0/10.0
+		print "Time for batch {} photos".format(args.batch_size), end - start
+		print "Remaining Hours For Whole Dataset" , (len(image_id_list) - idx)*(end - start)/60.0/60.0/args.batch_size
 
 		print "Images Processed", idx
 
