@@ -8,6 +8,33 @@ import h5py
 import time
 
 
+class FeatureExtractor:
+
+	def __init__(self):
+		model_path = 'Data/vgg16.tfmodel'
+		vgg_file = open(model_path)
+		vgg16raw = vgg_file.read()
+		vgg_file.close()
+
+		graph_def = tf.GraphDef()
+		graph_def.ParseFromString(vgg16raw)
+
+		self.images = tf.placeholder("float", [None, 224, 224, 3])
+		tf.import_graph_def(graph_def, input_map={"images": self.images})
+		self.graph = tf.get_default_graph()
+		self.sess = tf.Session(graph=self.graph)
+
+	def extract_image_features(self, img_path):
+
+		image_batch = np.ndarray((1, 224, 224, 3))
+		image_batch[0, :, :, :] = utils.load_image_array(img_path)
+
+		feed_dict = {self.images: image_batch[0:1, :, :, :]}
+		fc7_tensor = self.graph.get_tensor_by_name("import/Relu_1:0")
+		fc7_batch = self.sess.run(fc7_tensor, feed_dict=feed_dict)
+		return fc7_batch[0, :]
+
+
 def main():
 	parser = argparse.ArgumentParser()
 	parser.add_argument('--split', type=str, default='train', help='train/val')
