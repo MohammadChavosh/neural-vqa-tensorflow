@@ -1,9 +1,9 @@
 import tensorflow as tf
-from extract_fc7 import FeatureExtractor
+from utils import FeatureExtractor
 
 
 def main():
-	feature_extractor = FeatureExtractor()
+	feature_extractor = FeatureExtractor('Data/vgg16.tfmodel')
 	print feature_extractor.extract_image_features('Data/train2014/COCO_train2014_000000465294.jpg')
 	print feature_extractor.extract_image_features('Data/train2014/COCO_train2014_000000465285.jpg')
 	print feature_extractor.extract_image_features('Data/train2014/COCO_train2014_000000465269.jpg')

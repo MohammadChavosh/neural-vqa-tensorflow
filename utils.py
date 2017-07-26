@@ -18,24 +18,27 @@ def load_image_array(image_file):
 	return (img_resized / 255.0).astype('float32')
 
 
-# FOR PREDICTION ON A SINGLE IMAGE
-def extract_fc7_features(image_path, model_path):
-	vgg_file = open(model_path)
-	vgg16raw = vgg_file.read()
-	vgg_file.close()
+class FeatureExtractor:
 
-	graph_def = tf.GraphDef()
-	graph_def.ParseFromString(vgg16raw)
-	images = tf.placeholder("float32", [None, 224, 224, 3])
-	tf.import_graph_def(graph_def, input_map={"images": images})
-	graph = tf.get_default_graph()
+	def __init__(self, model_path):
+		vgg_file = open(model_path)
+		vgg16raw = vgg_file.read()
+		vgg_file.close()
 
-	sess = tf.Session()
-	image_array = load_image_array(image_path)
-	image_feed = np.ndarray((1, 224, 224, 3))
-	image_feed[0:, :, :] = image_array
-	feed_dict = {images: image_feed}
-	fc7_tensor = graph.get_tensor_by_name("import/Relu_1:0")
-	fc7_features = sess.run(fc7_tensor, feed_dict=feed_dict)
-	sess.close()
-	return fc7_features
+		graph_def = tf.GraphDef()
+		graph_def.ParseFromString(vgg16raw)
+
+		self.images = tf.placeholder("float", [None, 224, 224, 3])
+		tf.import_graph_def(graph_def, input_map={"images": self.images})
+		self.graph = tf.get_default_graph()
+		self.sess = tf.Session(graph=self.graph)
+
+	def extract_fc7_features(self, img_path):
+
+		image_batch = np.ndarray((1, 224, 224, 3))
+		image_batch[0, :, :, :] = load_image_array(img_path)
+
+		feed_dict = {self.images: image_batch[0:1, :, :, :]}
+		fc7_tensor = self.graph.get_tensor_by_name("import/Relu_1:0")
+		fc7_batch = self.sess.run(fc7_tensor, feed_dict=feed_dict)
+		return fc7_batch[0, :]
