@@ -1,16 +1,11 @@
 import tensorflow as tf
-from os.path import join
-import data_loader
 import utils
-import argparse
 import numpy as np
-import h5py
-import time
 
 model_path = 'Data/vgg16.tfmodel'
 
 
-def load_image_features(img_path):
+def get_vgg_graph():
 	vgg_file = open(model_path)
 	vgg16raw = vgg_file.read()
 	vgg_file.close()
@@ -21,24 +16,36 @@ def load_image_features(img_path):
 	images = tf.placeholder("float", [None, 224, 224, 3])
 	tf.import_graph_def(graph_def, input_map={"images": images})
 
-	graph = tf.get_default_graph()
+	return tf.get_default_graph(), images
 
-	for opn in graph.get_operations():
-		print "Name", opn.name, opn.values()
 
-	sess = tf.Session()
+def load_image_features(img_path, graph, images):
 
-	image_batch = np.ndarray((1, 224, 224, 3))
-	image_batch[0, :, :, :] = utils.load_image_array(img_path)
+	with tf.Session( graph = graph ) as sess:
+		image_batch = np.ndarray((1, 224, 224, 3))
+		image_batch[0, :, :, :] = utils.load_image_array(img_path)
 
-	feed_dict = {images: image_batch[0, :, :, :]}
-	fc7_tensor = graph.get_tensor_by_name("import/Relu_1:0")
-	fc7_batch = sess.run(fc7_tensor, feed_dict=feed_dict)
-	return fc7_batch[0, :]
+		feed_dict = {images: image_batch[0:1, :, :, :]}
+		fc7_tensor = graph.get_tensor_by_name("import/Relu_1:0")
+		fc7_batch = sess.run(fc7_tensor, feed_dict=feed_dict)
+		return fc7_batch[0, :]
 
 
 def main():
-	print load_image_features('Data/train2014/COCO_train2014_000000465294')
+	graph, images = get_vgg_graph()
+	print load_image_features('Data/train2014/COCO_train2014_000000465294.jpg', graph, images)
+
+	tf.reset_default_graph()
+	g1 = tf.Graph()
+	with g1.as_default() as g:
+		with g.name_scope("g1"):
+			matrix1 = tf.constant([[3., 3.]])
+			matrix2 = tf.constant([[2.],[2.]])
+			product = tf.matmul(matrix1, matrix2)
+
+	with tf.Session( graph = g1 ) as sess:
+		print sess.run(product)
+	print load_image_features('Data/train2014/COCO_train2014_000000465294.jpg', graph, images)
 
 
 if __name__ == '__main__':
