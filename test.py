@@ -5,8 +5,8 @@ from extract_fc7 import FeatureExtractor
 def main():
 	feature_extractor = FeatureExtractor()
 	print feature_extractor.extract_image_features('Data/train2014/COCO_train2014_000000465294.jpg')
-	print feature_extractor.extract_image_features('Data/train2014/COCO_train2014_000000465293.jpg')
-	print feature_extractor.extract_image_features('Data/train2014/COCO_train2014_000000465292.jpg')
+	print feature_extractor.extract_image_features('Data/train2014/COCO_train2014_000000465285.jpg')
+	print feature_extractor.extract_image_features('Data/train2014/COCO_train2014_000000465269.jpg')
 
 	g1 = tf.Graph()
 	with g1.as_default() as g:
@@ -18,7 +18,7 @@ def main():
 	with tf.Session(graph=g1) as sess:
 		print sess.run(product)
 
-	print feature_extractor.extract_image_features('Data/train2014/COCO_train2014_000000465291.jpg')
+	print feature_extractor.extract_image_features('Data/train2014/COCO_train2014_000000465266.jpg')
 
 
 if __name__ == '__main__':
