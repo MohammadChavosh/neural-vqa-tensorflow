@@ -32,7 +32,7 @@ def main():
 	for opn in graph.get_operations():
 		print "Name", opn.name, opn.values()
 
-	all_data = data_loader.load_questions_answers(args)
+	all_data = data_loader.load_questions_answers(args.version, args.data_dir)
 	if args.split == "train":
 		qa_data = all_data['training']
 	else:
