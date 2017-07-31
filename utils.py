@@ -35,10 +35,10 @@ class FeatureExtractor:
 		self.graph = tf.get_default_graph()
 		self.sess = tf.Session(graph=self.graph)
 
-	def extract_fc7_features(self, img_path):
+	def extract_fc7_features(self, img_array):
 
 		image_batch = np.ndarray((1, 224, 224, 3))
-		image_batch[0, :, :, :] = load_image_array(img_path)
+		image_batch[0, :, :, :] = img_array
 
 		feed_dict = {self.images: image_batch[0:1, :, :, :]}
 		fc7_tensor = self.graph.get_tensor_by_name("import/Relu_1:0")

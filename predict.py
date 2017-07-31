@@ -4,7 +4,7 @@ import data_loader
 import argparse
 import numpy as np
 from os.path import join
-from utils import FeatureExtractor
+from utils import FeatureExtractor, load_image_array
 import re
 
 def main():
@@ -42,7 +42,7 @@ def main():
 	q_map = { vocab_data['question_vocab'][qw] : qw for qw in vocab_data['question_vocab']}
 
 	feature_extractor = FeatureExtractor(join(args.data_dir, 'vgg16.tfmodel'))
-	fc7_features = feature_extractor.extract_fc7_features(args.image_path)
+	fc7_features = feature_extractor.extract_fc7_features(load_image_array(args.image_path))
 	
 	model_options = {
 		'num_lstm_layers' : args.num_lstm_layers,
