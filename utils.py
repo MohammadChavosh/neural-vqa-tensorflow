@@ -43,4 +43,4 @@ class FeatureExtractor:
 		feed_dict = {self.images: image_batch[0:1, :, :, :]}
 		fc7_tensor = self.graph.get_tensor_by_name("import/Relu_1:0")
 		fc7_batch = self.sess.run(fc7_tensor, feed_dict=feed_dict)
-		return fc7_batch[0, :]
+		return fc7_batch[0:1, :]
