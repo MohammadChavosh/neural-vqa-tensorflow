@@ -29,17 +29,15 @@ def main():
                        help='Data directory')
 	parser.add_argument('--question', type=str, default='Which animal is this?',
                        help='Question')
+	parser.add_argument('--version', type=int, default=2,
+                       help='VQA data version')
 	
-	
-
 	args = parser.parse_args()
 
 	print "Image:", args.image_path
 	print "Question:", args.question
 
-	vocab_data = data_loader.get_question_answer_vocab(args.data_dir)
-	qvocab = vocab_data['question_vocab']
-	q_map = { vocab_data['question_vocab'][qw] : qw for qw in vocab_data['question_vocab']}
+	vocab_data = data_loader.get_question_answer_vocab(args.version, args.data_dir)
 
 	feature_extractor = FeatureExtractor(join(args.data_dir, 'vgg16.tfmodel'))
 	fc7_features = feature_extractor.extract_fc7_features(load_image_array(args.image_path))

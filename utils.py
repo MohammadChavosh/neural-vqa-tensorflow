@@ -5,7 +5,7 @@ import tensorflow as tf
 
 # VGG 16 accepts RGB channel 0 to 1 (This tensorflow model).
 # crop_coordinates is in type [x1, y1, x2, y2]
-def load_image_array(image_file, crop_coordinates=None):
+def load_image_array(image_file, resize=True):
 	img = misc.imread(image_file)
 	# GRAYSCALE
 	if len(img.shape) == 2:
@@ -14,10 +14,10 @@ def load_image_array(image_file, crop_coordinates=None):
 		img_new[:, :, 1] = img
 		img_new[:, :, 2] = img
 		img = img_new
-	if crop_coordinates is not None:
-		img = img[crop_coordinates[0]:crop_coordinates[2], crop_coordinates[1]:crop_coordinates[3], :]
-	img_resized = misc.imresize(img, (224, 224))
-	return (img_resized / 255.0).astype('float32')
+	if resize:
+		img_resized = misc.imresize(img, (224, 224))
+		return (img_resized / 255.0).astype('float32')
+	return (img / 255.0).astype('float32')
 
 
 class FeatureExtractor:
