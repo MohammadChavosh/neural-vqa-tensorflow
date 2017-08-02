@@ -104,19 +104,19 @@ def get_training_batch(batch_no, batch_size, fc7_features, image_id_map, qa_data
 	else:
 		qa = qa_data['validation']
 
-	si = (batch_no * batch_size)%len(qa)
+	si = (batch_no * batch_size) % len(qa)
 	ei = min(len(qa), si + batch_size)
 	n = ei - si
-	sentence = np.ndarray( (n, qa_data['max_question_length']), dtype = 'int32')
-	answer = np.zeros( (n, len(qa_data['answer_vocab'])))
-	fc7 = np.ndarray( (n,4096) )
+	sentence = np.ndarray((n, qa_data['max_question_length']), dtype='int32')
+	answer = np.zeros((n, len(qa_data['answer_vocab'])))
+	fc7 = np.ndarray((n, 4096))
 
 	count = 0
 	for i in range(si, ei):
-		sentence[count,:] = qa[i]['question'][:]
+		sentence[count, :] = qa[i]['question'][:]
 		answer[count, qa[i]['answer']] = 1.0
-		fc7_index = image_id_map[ qa[i]['image_id'] ]
-		fc7[count,:] = fc7_features[fc7_index][:]
+		fc7_index = image_id_map[qa[i]['image_id']]
+		fc7[count, :] = fc7_features[fc7_index][:]
 		count += 1
 	
 	return sentence, answer, fc7

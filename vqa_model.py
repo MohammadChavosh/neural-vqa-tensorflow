@@ -39,14 +39,18 @@ class VQAModel:
 		question_vocab = self.vocab_data['question_vocab']
 		for i in range(0, len(question_words)):
 			if question_words[i] in question_vocab:
-				question_ids[0][base + i] = question_vocab[ question_words[i] ]
+				question_ids[0][base + i] = question_vocab[question_words[i]]
 			else:
 				question_ids[0][base + i] = question_vocab['UNK']
+
+		answer_vocab = self.vocab_data['answer_vocab']
+		answer_id = np.zeros((1, len(answer_vocab)))
+		answer_id[0, answer_vocab[answer]] = 1.0
 
 		loss, accuracy, predictions = self.sess.run([self.loss, self.accuracy, self.predictions], feed_dict={
 			self.input_tensors['fc7']: fc7_features,
 			self.input_tensors['sentence']: question_ids,
-			self.input_tensors['answer']: answer
+			self.input_tensors['answer']: answer_id
 		})
 
 		return loss, accuracy, predictions

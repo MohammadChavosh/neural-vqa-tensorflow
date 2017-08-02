@@ -61,11 +61,11 @@ def main():
 	base = vocab_data['max_question_length'] - len(question_words)
 	for i in range(0, len(question_words)):
 		if question_words[i] in question_vocab:
-			question_ids[0][base + i] = question_vocab[ question_words[i] ]
+			question_ids[0][base + i] = question_vocab[question_words[i]]
 		else:
 			question_ids[0][base + i] = question_vocab['UNK']
 
-	ans_map = { vocab_data['answer_vocab'][ans] : ans for ans in vocab_data['answer_vocab']}
+	ans_map = {vocab_data['answer_vocab'][ans]: ans for ans in vocab_data['answer_vocab']}
 	model = vis_lstm_model.Vis_lstm_model(model_options)
 	input_tensors, t_prediction, t_ans_probab = model.build_generator()
 	sess = tf.InteractiveSession()
@@ -77,13 +77,13 @@ def main():
         input_tensors['sentence']:question_ids,
     })
 
-	
+
 	print "Ans:", ans_map[pred[0]]
 	answer_probab_tuples = [(-answer_probab[0][idx], idx) for idx in range(len(answer_probab[0]))]
 	answer_probab_tuples.sort()
 	print "Top Answers"
 	for i in range(5):
-		print ans_map[ answer_probab_tuples[i][1] ]
+		print ans_map[answer_probab_tuples[i][1]]
 
 if __name__ == '__main__':
 	main()
