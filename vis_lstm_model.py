@@ -65,14 +65,10 @@ class Vis_lstm_model:
 
 		return output
 
-
-
-
 	def build_model(self):
 		fc7_features = tf.placeholder('float32',[ None, self.options['fc7_feature_length'] ], name = 'fc7')
 		sentence = tf.placeholder('int32',[None, self.options['lstm_steps'] - 1], name = "sentence")
 		answer = tf.placeholder('float32', [None, self.options['ans_vocab_size']], name = "answer")
-
 
 		word_embeddings = []
 		for i in range(self.options['lstm_steps']-1):
@@ -90,7 +86,7 @@ class Vis_lstm_model:
 		lstm_answer = lstm_output[-1]
 		logits = tf.matmul(lstm_answer, self.ans_sm_W) + self.ans_sm_b
 		# ce = tf.nn.softmax_cross_entropy_with_logits(logits, answer, name = 'ce')
-		ce = tf.nn.softmax_cross_entropy_with_logits(labels=answer, logits= logits, name = 'ce')
+		ce = tf.nn.softmax_cross_entropy_with_logits(labels=answer, logits=logits, name='ce')
 		answer_probab = tf.nn.softmax(logits, name='answer_probab')
 		
 		predictions = tf.argmax(answer_probab,1)
@@ -99,15 +95,15 @@ class Vis_lstm_model:
 
 		loss = tf.reduce_sum(ce, name = 'loss')
 		input_tensors = {
-			'fc7' : fc7_features,
-			'sentence' : sentence,
-			'answer' : answer
+			'fc7': fc7_features,
+			'sentence': sentence,
+			'answer': answer
 		}
 		return input_tensors, loss, accuracy, predictions
 
 	def build_generator(self):
-		fc7_features = tf.placeholder('float32',[ None, self.options['fc7_feature_length'] ], name = 'fc7')
-		sentence = tf.placeholder('int32',[None, self.options['lstm_steps'] - 1], name = "sentence")
+		fc7_features = tf.placeholder('float32',[None, self.options['fc7_feature_length']], name='fc7')
+		sentence = tf.placeholder('int32',[None, self.options['lstm_steps'] - 1], name="sentence")
 
 		word_embeddings = []
 		for i in range(self.options['lstm_steps']-1):
@@ -123,12 +119,12 @@ class Vis_lstm_model:
 		logits = tf.matmul(lstm_answer, self.ans_sm_W) + self.ans_sm_b
 		
 		answer_probab = tf.nn.softmax(logits, name='answer_probab')
-		
+
 		predictions = tf.argmax(answer_probab,1)
 
 		input_tensors = {
-			'fc7' : fc7_features,
-			'sentence' : sentence
+			'fc7': fc7_features,
+			'sentence': sentence
 		}
 
 		return input_tensors, predictions, answer_probab
