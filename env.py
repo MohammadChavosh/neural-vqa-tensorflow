@@ -13,7 +13,7 @@ class Environment:
 		self.crop_coordinates = [0, 0, img_size[0], img_size[1]]
 		self.x_alpha = img_size[0] / 10.0
 		self.y_alpha = img_size[1] / 10.0
-		self.vqa_model = VQAModel('Data/Models/model199.cpkt')
+		self.vqa_model = VQAModel()
 		self.feature_extractor = FeatureExtractor(join('Data', 'vgg16.tfmodel'))
 		img_features = self.get_resized_region_image_features()
 		self.latest_loss, _, _ = self.vqa_model.get_result(img_features, self.question)
