@@ -129,4 +129,35 @@ class Vis_lstm_model:
 
 		return input_tensors, predictions, answer_probab
 
+	def build_for_rl(self):
+		fc7_features = tf.placeholder('float32',[None, self.options['fc7_feature_length']], name='fc7')
+		sentence = tf.placeholder('int32',[None, self.options['lstm_steps'] - 1], name="sentence")
+		answer = tf.placeholder('float32', [None, self.options['ans_vocab_size']], name="answer")
 
+		word_embeddings = []
+		for i in range(self.options['lstm_steps']-1):
+			word_emb = tf.nn.embedding_lookup(self.Wemb, sentence[:,i])
+			word_embeddings.append(word_emb)
+
+		image_embedding = tf.matmul(fc7_features, self.Wimg) + self.bimg
+		image_embedding = tf.nn.tanh(image_embedding)
+
+		word_embeddings.append(image_embedding)
+		lstm_output = self.forward_pass_lstm(word_embeddings)
+		lstm_answer = lstm_output[-1]
+		logits = tf.matmul(lstm_answer, self.ans_sm_W) + self.ans_sm_b
+
+		ce = tf.nn.softmax_cross_entropy_with_logits(labels=answer, logits=logits, name='ce')
+		answer_probab = tf.nn.softmax(logits, name='answer_probab')
+
+		predictions = tf.argmax(answer_probab,1)
+		correct_predictions = tf.equal(tf.argmax(answer_probab, 1), tf.argmax(answer, 1))
+		accuracy = tf.reduce_mean(tf.cast(correct_predictions, tf.float32))
+
+		loss = tf.reduce_sum(ce, name='loss')
+		input_tensors = {
+			'fc7': fc7_features,
+			'sentence': sentence,
+			'answer': answer
+		}
+		return input_tensors, loss, accuracy, predictions

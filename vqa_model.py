@@ -24,7 +24,7 @@ class VQAModel:
 
 		self.ans_map = {self.vocab_data['answer_vocab'][ans]: ans for ans in self.vocab_data['answer_vocab']}
 		model = vis_lstm_model.Vis_lstm_model(model_options)
-		self.input_tensors, self.loss, self.accuracy, self.predictions = model.build_model()
+		self.input_tensors, self.loss, self.accuracy, self.predictions = model.build_for_rl()
 
 		model_path = 'Data/Models/model199.ckpt'
 		self.sess = tf.InteractiveSession()
