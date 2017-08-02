@@ -45,7 +45,6 @@ class Environment:
 		img_features = self.get_resized_region_image_features()
 		if action_type == 'End':
 			_, accuracy, _ = self.vqa_model.get_result(img_features, self.question, self.answer)
-			print 'End_Accuracy', accuracy
 			if accuracy < 0.1:
 				return self.TRIGGER_NEGATIVE_REWARD
 			if accuracy > 0.9:
