@@ -66,9 +66,9 @@ class Vis_lstm_model:
 		return output
 
 	def build_model(self):
-		fc7_features = tf.placeholder('float32',[ None, self.options['fc7_feature_length'] ], name = 'fc7')
-		sentence = tf.placeholder('int32',[None, self.options['lstm_steps'] - 1], name = "sentence")
-		answer = tf.placeholder('float32', [None, self.options['ans_vocab_size']], name = "answer")
+		fc7_features = tf.placeholder('float32', [None, self.options['fc7_feature_length']], name='fc7')
+		sentence = tf.placeholder('int32', [None, self.options['lstm_steps'] - 1], name="sentence")
+		answer = tf.placeholder('float32', [None, self.options['ans_vocab_size']], name="answer")
 
 		word_embeddings = []
 		for i in range(self.options['lstm_steps']-1):
@@ -90,10 +90,10 @@ class Vis_lstm_model:
 		answer_probab = tf.nn.softmax(logits, name='answer_probab')
 		
 		predictions = tf.argmax(answer_probab,1)
-		correct_predictions = tf.equal(tf.argmax(answer_probab,1), tf.argmax(answer,1))
+		correct_predictions = tf.equal(tf.argmax(answer_probab, 1), tf.argmax(answer, 1))
 		accuracy = tf.reduce_mean(tf.cast(correct_predictions, tf.float32))
 
-		loss = tf.reduce_sum(ce, name = 'loss')
+		loss = tf.reduce_sum(ce, name='loss')
 		input_tensors = {
 			'fc7': fc7_features,
 			'sentence': sentence,
