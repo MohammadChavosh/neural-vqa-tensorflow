@@ -3,7 +3,7 @@ import random
 
 
 def main():
-	environment = Environment('Data/train2014/COCO_train2014_000000465294.jpg', 'What is the name of fruit in the picture?')
+	environment = Environment('Data/train2014/COCO_train2014_000000465294.jpg', 'What is the name of fruit in the picture?', 'banana')
 	print environment.latest_loss
 	print environment.crop_coordinates
 	print '--------------------'

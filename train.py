@@ -46,7 +46,7 @@ def main():
 	for i in xrange(len(image_id_list)):
 		image_id_map[ image_id_list[i] ] = i
 
-	ans_map = { qa_data['answer_vocab'][ans] : ans for ans in qa_data['answer_vocab']}
+	ans_map = {qa_data['answer_vocab'][ans]: ans for ans in qa_data['answer_vocab']}
 
 	model_options = {
 		'num_lstm_layers' : args.num_lstm_layers,
@@ -59,16 +59,13 @@ def main():
 		'q_vocab_size' : len(qa_data['question_vocab']),
 		'ans_vocab_size' : len(qa_data['answer_vocab'])
 	}
-	
-	
-	
+
 	model = vis_lstm_model.Vis_lstm_model(model_options)
 	input_tensors, t_loss, t_accuracy, t_p = model.build_model()
 	train_op = tf.train.AdamOptimizer(args.learning_rate).minimize(t_loss)
 	sess = tf.InteractiveSession()
 	tf.initialize_all_variables().run()
 
-	
 	saver = tf.train.Saver()
 	if args.resume_model:
 		saver.restore(sess, args.resume_model)

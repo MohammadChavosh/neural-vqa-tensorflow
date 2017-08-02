@@ -31,7 +31,7 @@ class VQAModel:
 		saver = tf.train.Saver()
 		saver.restore(self.sess, model_path)
 
-	def get_result(self, fc7_features, question):
+	def get_result(self, fc7_features, question, answer):
 		word_regex = re.compile(r'\w+')
 		question_ids = np.zeros((1, self.vocab_data['max_question_length']), dtype='int32')
 		question_words = re.findall(word_regex, question)
@@ -46,6 +46,7 @@ class VQAModel:
 		loss, accuracy, predictions = self.sess.run([self.loss, self.accuracy, self.predictions], feed_dict={
 			self.input_tensors['fc7']: fc7_features,
 			self.input_tensors['sentence']: question_ids,
+			self.input_tensors['answer']: answer
 		})
 
 		return loss, accuracy, predictions

@@ -6,9 +6,10 @@ from os.path import join
 
 class Environment:
 
-	def __init__(self, img_path, question):
+	def __init__(self, img_path, question, answer):
 		self.img_array = load_image_array(img_path, False)
 		self.question = question
+		self.answer = answer
 		img_size = self.img_array.shape
 		self.crop_coordinates = [0, 0, img_size[0], img_size[1]]
 		self.x_alpha = img_size[0] / 10.0
@@ -16,7 +17,7 @@ class Environment:
 		self.vqa_model = VQAModel()
 		self.feature_extractor = FeatureExtractor(join('Data', 'vgg16.tfmodel'))
 		img_features = self.get_resized_region_image_features()
-		self.latest_loss, _, _ = self.vqa_model.get_result(img_features, self.question)
+		self.latest_loss, _, _ = self.vqa_model.get_result(img_features, self.question, self.answer)
 
 		self.TRIGGER_NEGATIVE_REWARD = -3
 		self.TRIGGER_POSITIVE_REWARD = 3
@@ -43,13 +44,13 @@ class Environment:
 			self.crop_coordinates[3] = min(self.crop_coordinates[3] + self.y_alpha, img_size[1])
 		img_features = self.get_resized_region_image_features()
 		if action_type == 'Trigger':
-			_, accuracy, _ = self.vqa_model.get_result(img_features, self.question)
+			_, accuracy, _ = self.vqa_model.get_result(img_features, self.question, self.answer)
 			if accuracy < 0.1:
 				return self.TRIGGER_NEGATIVE_REWARD
 			if accuracy > 0.9:
 				return self.TRIGGER_POSITIVE_REWARD
 		else:
-			loss, _, _ = self.vqa_model.get_result(img_features, self.question)
+			loss, _, _ = self.vqa_model.get_result(img_features, self.question, self.answer)
 			if self.latest_loss > loss:
 				self.latest_loss = loss
 				return self.MOVE_POSITIVE_REWARD
