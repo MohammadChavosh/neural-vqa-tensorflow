@@ -17,7 +17,7 @@ class Environment:
 		self.vqa_model = VQAModel()
 		self.feature_extractor = FeatureExtractor(join('Data', 'vgg16.tfmodel'))
 		img_features = self.get_resized_region_image_features()
-		self.latest_loss, _, _ = self.vqa_model.get_result(img_features, self.question, self.answer)
+		self.latest_loss, self.latest_accuracy, _ = self.vqa_model.get_result(img_features, self.question, self.answer)
 
 		self.TRIGGER_NEGATIVE_REWARD = -3
 		self.TRIGGER_POSITIVE_REWARD = 3
@@ -44,19 +44,19 @@ class Environment:
 			self.crop_coordinates[3] = min(self.crop_coordinates[3] + self.y_alpha, img_size[1])
 		img_features = self.get_resized_region_image_features()
 		if action_type == 'End':
-			_, accuracy, _ = self.vqa_model.get_result(img_features, self.question, self.answer)
-			if accuracy < 0.1:
-				return self.TRIGGER_NEGATIVE_REWARD, accuracy
-			if accuracy > 0.9:
-				return self.TRIGGER_POSITIVE_REWARD, accuracy
+			self.latest_loss, self.latest_accuracy, _ = self.vqa_model.get_result(img_features, self.question, self.answer)
+			if self.latest_accuracy < 0.1:
+				return self.TRIGGER_NEGATIVE_REWARD
+			if self.latest_accuracy > 0.9:
+				return self.TRIGGER_POSITIVE_REWARD
 		else:
-			loss, accuracy, _ = self.vqa_model.get_result(img_features, self.question, self.answer)
+			loss, self.latest_accuracy, _ = self.vqa_model.get_result(img_features, self.question, self.answer)
 			if self.latest_loss > loss:
 				self.latest_loss = loss
-				return self.MOVE_POSITIVE_REWARD, accuracy
+				return self.MOVE_POSITIVE_REWARD
 			else:
 				self.latest_loss = loss
-				return self.MOVE_NEGATIVE_REWARD, accuracy
+				return self.MOVE_NEGATIVE_REWARD
 
 	def get_resized_region_image_features(self):
 		img = self.img_array[self.crop_coordinates[0]:self.crop_coordinates[2], self.crop_coordinates[1]:self.crop_coordinates[3], :]
