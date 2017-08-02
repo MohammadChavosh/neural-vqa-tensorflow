@@ -46,17 +46,17 @@ class Environment:
 		if action_type == 'End':
 			_, accuracy, _ = self.vqa_model.get_result(img_features, self.question, self.answer)
 			if accuracy < 0.1:
-				return self.TRIGGER_NEGATIVE_REWARD
+				return self.TRIGGER_NEGATIVE_REWARD, accuracy
 			if accuracy > 0.9:
-				return self.TRIGGER_POSITIVE_REWARD
+				return self.TRIGGER_POSITIVE_REWARD, accuracy
 		else:
-			loss, _, _ = self.vqa_model.get_result(img_features, self.question, self.answer)
+			loss, accuracy, _ = self.vqa_model.get_result(img_features, self.question, self.answer)
 			if self.latest_loss > loss:
 				self.latest_loss = loss
-				return self.MOVE_POSITIVE_REWARD
+				return self.MOVE_POSITIVE_REWARD, accuracy
 			else:
 				self.latest_loss = loss
-				return self.MOVE_NEGATIVE_REWARD
+				return self.MOVE_NEGATIVE_REWARD, accuracy
 
 	def get_resized_region_image_features(self):
 		img = self.img_array[self.crop_coordinates[0]:self.crop_coordinates[2], self.crop_coordinates[1]:self.crop_coordinates[3], :]

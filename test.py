@@ -12,7 +12,7 @@ def main():
 		print 'valid_actions: ', valid_actions
 		action = random.sample(valid_actions, 1)[0]
 		print 'action: ', action
-		print 'reward: ', environment.action(action)
+		print 'reward, accuracy: ', environment.action(action)
 		print 'coordinates: ', environment.crop_coordinates
 		print 'latest_loss: ', environment.latest_loss
 		print '----------------------'
