@@ -62,6 +62,7 @@ class Environment:
 		img = self.img_array[self.crop_coordinates[0]:self.crop_coordinates[2], self.crop_coordinates[1]:self.crop_coordinates[3], :]
 		img = misc.imresize(img, (224, 224))
 		img = (img / 255.0).astype('float32')
+		print img
 		return self.feature_extractor.extract_fc7_features(img)
 
 	def valid_actions(self):
