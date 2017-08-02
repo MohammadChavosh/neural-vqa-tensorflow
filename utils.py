@@ -3,7 +3,6 @@ from scipy import misc
 import tensorflow as tf
 
 
-# VGG 16 accepts RGB channel 0 to 1 (This tensorflow model).
 # crop_coordinates is in type [x1, y1, x2, y2]
 def load_image_array(image_file, resize=True):
 	img = misc.imread(image_file)
@@ -17,7 +16,7 @@ def load_image_array(image_file, resize=True):
 	if resize:
 		img_resized = misc.imresize(img, (224, 224))
 		return (img_resized / 255.0).astype('float32')
-	return (img / 255.0).astype('float32')
+	return img
 
 
 class FeatureExtractor:
