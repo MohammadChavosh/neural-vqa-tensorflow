@@ -31,6 +31,9 @@ class VQAModel:
 		saver = tf.train.Saver()
 		saver.restore(self.sess, model_path)
 
+		self.q = None
+		self.a = None
+
 	def get_result(self, fc7_features, question, answer):
 		word_regex = re.compile(r'\w+')
 		question_ids = np.zeros((1, self.vocab_data['max_question_length']), dtype='int32')
@@ -52,5 +55,18 @@ class VQAModel:
 			self.input_tensors['sentence']: question_ids,
 			self.input_tensors['answer']: answer_id
 		})
-
+		if self.q is None:
+			self.q = question_ids
+		else:
+			if np.array_equal(self.q, question_ids):
+				print "YES"
+			else:
+				print "first NOO"
+		if self.a is None:
+			self.a = answer_id
+		else:
+			if np.array_equal(self.a, answer_id):
+				print "YES"
+			else:
+				print "second NOO"
 		return loss, accuracy, predictions
