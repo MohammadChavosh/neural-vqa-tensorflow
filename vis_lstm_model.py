@@ -160,4 +160,4 @@ class Vis_lstm_model:
 			'sentence': sentence,
 			'answer': answer
 		}
-		return input_tensors, loss, accuracy, predictions
+		return input_tensors, loss, accuracy, lstm_answer, predictions

@@ -24,7 +24,7 @@ class VQAModel:
 
 		self.ans_map = {self.vocab_data['answer_vocab'][ans]: ans for ans in self.vocab_data['answer_vocab']}
 		model = vis_lstm_model.Vis_lstm_model(model_options)
-		self.input_tensors, self.loss, self.accuracy, self.predictions = model.build_for_rl()
+		self.input_tensors, self.loss, self.accuracy, self.lstm_answer, self.predictions = model.build_for_rl()
 
 		model_path = 'Data/Models/model199.ckpt'
 		self.sess = tf.InteractiveSession()
@@ -47,9 +47,9 @@ class VQAModel:
 		answer_id = np.zeros((1, len(answer_vocab)))
 		answer_id[0, answer_vocab[answer]] = 1.0
 
-		loss, accuracy, predictions = self.sess.run([self.loss, self.accuracy, self.predictions], feed_dict={
+		loss, accuracy, lstm_answer, predictions = self.sess.run([self.loss, self.accuracy, self.lstm_answer, self.predictions], feed_dict={
 			self.input_tensors['fc7']: fc7_features,
 			self.input_tensors['sentence']: question_ids,
 			self.input_tensors['answer']: answer_id
 		})
-		return loss, accuracy, predictions
+		return loss, accuracy, lstm_answer, predictions
