@@ -98,7 +98,7 @@ class ValueEstimator():
 	"""
 
 	def __init__(self, reuse=False, trainable=True):
-		self.states = tf.placeholder(shape=[None, 4096 + 512], dtype=tf.uint8, name="X")
+		self.states = tf.placeholder(shape=[None, 512], dtype=tf.uint8, name="X")
 		self.targets = tf.placeholder(shape=[None], dtype=tf.float32, name="y")
 
 		# Graph shared with Value Net
