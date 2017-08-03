@@ -12,6 +12,7 @@ def build_shared_network(states, add_summaries=False):
 	"""
 
 	# Fully connected layer
+	states = tf.to_float(states)
 	fc1 = tf.contrib.layers.fully_connected(
 		inputs=states,
 		num_outputs=256,
