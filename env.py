@@ -61,7 +61,8 @@ class Environment:
 				return self.MOVE_NEGATIVE_REWARD, False
 
 	def get_resized_region_image_features(self):
-		img = self.img_array[self.crop_coordinates[0]:self.crop_coordinates[2], self.crop_coordinates[1]:self.crop_coordinates[3], :]
+		rounded_coordinates = map(lambda x:int(round(x)), self.crop_coordinates)
+		img = self.img_array[rounded_coordinates[0]:rounded_coordinates[2], rounded_coordinates[1]:rounded_coordinates[3], :]
 		img = misc.imresize(img, (224, 224))
 		img = (img / 255.0).astype('float32')
 		return Environment.feature_extractor.extract_fc7_features(img)
