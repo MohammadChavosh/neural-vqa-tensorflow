@@ -129,7 +129,7 @@ class Worker(object):
 			# Take a step
 			action_probs = self._policy_net_predict(self.state, sess)
 			action = np.random.choice(np.arange(len(action_probs)), p=action_probs)
-			reward, done = self.env.action(VALID_ACTIONS(action))
+			reward, done = self.env.action(VALID_ACTIONS[action])
 			next_state = self.env.state
 
 			# Store transition
