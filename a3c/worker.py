@@ -94,7 +94,6 @@ class Worker(object):
 		with sess.as_default(), sess.graph.as_default():
 			# Initial state
 			self.state = self.env.state
-			print "initial state.shape: ", self.state.shape
 			try:
 				while not coord.should_stop():
 					# Copy Parameters from the global networks
@@ -115,12 +114,12 @@ class Worker(object):
 				return
 
 	def _policy_net_predict(self, state, sess):
-		feed_dict = {self.policy_net.states: [state]}
+		feed_dict = {self.policy_net.states: state}
 		preds = sess.run(self.policy_net.predictions, feed_dict)
 		return preds["probs"][0]
 
 	def _value_net_predict(self, state, sess):
-		feed_dict = {self.value_net.states: [state]}
+		feed_dict = {self.value_net.states: state}
 		preds = sess.run(self.value_net.predictions, feed_dict)
 		return preds["logits"][0]
 
@@ -128,7 +127,6 @@ class Worker(object):
 		transitions = []
 		for _ in range(n):
 			# Take a step
-			print "state.shape: ", self.state.shape
 			action_probs = self._policy_net_predict(self.state, sess)
 			action = np.random.choice(np.arange(len(action_probs)), p=action_probs)
 			reward, done = self.env.action(VALID_ACTIONS(action))
