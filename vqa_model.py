@@ -23,12 +23,17 @@ class VQAModel:
 			'q_vocab_size': len(self.vocab_data['question_vocab']),
 			'ans_vocab_size': len(self.vocab_data['answer_vocab'])
 		}
-		model = vis_lstm_model.Vis_lstm_model(model_options)
-		self.input_tensors, self.loss, self.accuracy, self.lstm_answer, self.predictions = model.build_for_rl()
+
+		graph = tf.Graph()
+		with graph.as_default():
+			model = vis_lstm_model.Vis_lstm_model(model_options)
+			self.input_tensors, self.loss, self.accuracy, self.lstm_answer, self.predictions = model.build_for_rl()
 		model_path = 'Data/Models/model199.ckpt'
-		self.sess = tf.Session()
-		saver = tf.train.Saver()
-		saver.restore(self.sess, model_path)
+		self.sess = tf.Session(graph=graph)
+		with self.sess.as_default():
+			with graph.as_default():
+				saver = tf.train.Saver()
+				saver.restore(self.sess, model_path)
 
 	def get_result(self, fc7_features, question, answer):
 		word_regex = re.compile(r'\w+')
