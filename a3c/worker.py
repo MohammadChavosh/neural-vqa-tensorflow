@@ -125,10 +125,10 @@ class Worker(object):
 
 	def run_n_steps(self, n, sess):
 		transitions = []
-		for _ in range(n):
+		for i in range(n):
 			# Take a step
 			if self.state is None:
-				print "FIRST INVALID ACTION: ", action
+				print "FIRST INVALID ACTION: ", i
 			action_probs = self._policy_net_predict(self.state, sess)
 			action = np.random.choice(np.arange(len(action_probs)), p=action_probs)
 			reward, done = self.env.action(VALID_ACTIONS[action])
