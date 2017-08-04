@@ -56,4 +56,4 @@ class VQAModel:
 			self.input_tensors['sentence']: question_ids,
 			self.input_tensors['answer']: answer_id
 		})
-		return loss, accuracy, lstm_answer, predictions
+		return loss, accuracy, lstm_answer[0, :, :], predictions
