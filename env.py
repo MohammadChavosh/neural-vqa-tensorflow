@@ -7,6 +7,7 @@ VALID_ACTIONS = ['End', 'Upper_Up', 'Upper_Down', 'Bottom_Up', 'Bottom_Down', 'L
 
 
 class Environment:
+	feature_extractor = FeatureExtractor(join('Data', 'vgg16.tfmodel'))
 
 	def __init__(self, img_path, question, answer):
 		self.img_array = load_image_array(img_path, False)
@@ -17,7 +18,6 @@ class Environment:
 		self.x_alpha = img_size[0] / 10.0
 		self.y_alpha = img_size[1] / 10.0
 		self.vqa_model = VQAModel()
-		self.feature_extractor = FeatureExtractor(join('Data', 'vgg16.tfmodel'))
 		self.img_features = self.get_resized_region_image_features()
 		self.latest_loss, self.latest_accuracy, self.state, _ = self.vqa_model.get_result(self.img_features, self.question, self.answer)
 
@@ -64,7 +64,7 @@ class Environment:
 		img = self.img_array[self.crop_coordinates[0]:self.crop_coordinates[2], self.crop_coordinates[1]:self.crop_coordinates[3], :]
 		img = misc.imresize(img, (224, 224))
 		img = (img / 255.0).astype('float32')
-		return self.feature_extractor.extract_fc7_features(img)
+		return Environment.feature_extractor.extract_fc7_features(img)
 
 	def valid_actions(self):
 		img_size = self.img_array.shape
