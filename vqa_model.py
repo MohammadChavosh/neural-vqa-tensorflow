@@ -29,7 +29,7 @@ class VQAModel:
 		graph = tf.Graph()
 		model_path = 'Data/Models/model199.ckpt'
 		self.sess = tf.Session(graph=graph)
-		saver = tf.train.Saver()
+		saver = tf.train.import_meta_graph(model_path + '.meta')
 		saver.restore(self.sess, model_path)
 
 	def get_result(self, fc7_features, question, answer):
