@@ -174,17 +174,16 @@ class Worker(object):
 			reward = transition.reward + self.discount_factor * reward
 			policy_target = (reward - self._value_net_predict(transition.state, sess))
 			# Accumulate updates
-			print transition.state.shape
 			states.append(transition.state)
 			actions.append(transition.action)
 			policy_targets.append(policy_target)
 			value_targets.append(reward)
 
 		feed_dict = {
-			self.policy_net.states: np.array(states),
+			self.policy_net.states: np.squeeze(np.array(states)),
 			self.policy_net.targets: policy_targets,
 			self.policy_net.actions: actions,
-			self.value_net.states: np.array(states),
+			self.value_net.states: np.squeeze(np.array(states)),
 			self.value_net.targets: value_targets,
 		}
 
