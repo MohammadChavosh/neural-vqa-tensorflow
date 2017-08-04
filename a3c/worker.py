@@ -125,10 +125,8 @@ class Worker(object):
 
 	def run_n_steps(self, n, sess):
 		transitions = []
-		for i in range(n):
+		for _ in range(n):
 			# Take a step
-			if self.state is None:
-				print "FIRST INVALID ACTION: ", i
 			action_probs = self._policy_net_predict(self.state, sess)
 			action = np.random.choice(np.arange(len(action_probs)), p=action_probs)
 			reward, done = self.env.action(VALID_ACTIONS[action])
@@ -146,8 +144,8 @@ class Worker(object):
 				tf.logging.info("{}: local Step {}, global step {}".format(self.name, local_t, global_t))
 
 			if done:
-				print "HERE!!"
-				self.state = self.env.reset()
+				self.env.reset()
+				self.state = self.env.state
 				break
 			else:
 				self.state = next_state
