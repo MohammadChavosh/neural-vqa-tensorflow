@@ -138,6 +138,7 @@ class Worker(object):
 
 			# Increase local and global counters
 			local_t = next(self.local_counter)
+			print local_t
 			global_t = next(self.global_counter)
 
 			if local_t % 100 == 0:
