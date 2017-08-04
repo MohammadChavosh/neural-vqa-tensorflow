@@ -127,12 +127,14 @@ class Worker(object):
 		transitions = []
 		for _ in range(n):
 			# Take a step
+			if self.state is None:
+				print "FIRST INVALID ACTION: ", action
 			action_probs = self._policy_net_predict(self.state, sess)
 			action = np.random.choice(np.arange(len(action_probs)), p=action_probs)
 			reward, done = self.env.action(VALID_ACTIONS[action])
 			next_state = self.env.state
 			if next_state is None:
-				print action
+				print "SECOND INVALID ACTION: ", action
 
 			# Store transition
 			transitions.append(Transition(
