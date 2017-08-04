@@ -131,7 +131,7 @@ class Worker(object):
 			action = np.random.choice(np.arange(len(action_probs)), p=action_probs)
 			reward, done = self.env.action(VALID_ACTIONS(action))
 			next_state = self.env.state
-			print next_state.shape
+			print "next_state.shape: ", next_state.shape
 			# Store transition
 			transitions.append(Transition(
 				state=self.state, action=action, reward=reward, next_state=next_state, done=done))
