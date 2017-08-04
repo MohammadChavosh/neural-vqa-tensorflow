@@ -7,6 +7,8 @@ import re
 
 class VQAModel:
 	def __init__(self):
+		graph = tf.Graph()
+
 		data_dir = 'Data'
 		version = 1
 		self.vocab_data = data_loader.get_question_answer_vocab(version, data_dir)
@@ -26,9 +28,8 @@ class VQAModel:
 		model = vis_lstm_model.Vis_lstm_model(model_options)
 		self.input_tensors, self.loss, self.accuracy, self.lstm_answer, self.predictions = model.build_for_rl()
 
-		tf.reset_default_graph()
 		model_path = 'Data/Models/model199.ckpt'
-		self.sess = tf.Session()
+		self.sess = tf.Session(graph=graph)
 		saver = tf.train.Saver()
 		saver.restore(self.sess, model_path)
 
