@@ -26,9 +26,9 @@ class VQAModel:
 		model = vis_lstm_model.Vis_lstm_model(model_options)
 		self.input_tensors, self.loss, self.accuracy, self.lstm_answer, self.predictions = model.build_for_rl()
 
-		graph = tf.Graph()
+		tf.reset_default_graph()
 		model_path = 'Data/Models/model199.ckpt'
-		self.sess = tf.InteractiveSession(graph=graph)
+		self.sess = tf.Session()
 		saver = tf.train.Saver()
 		saver.restore(self.sess, model_path)
 
