@@ -113,8 +113,8 @@ with tf.Session() as sess:
 		worker_threads.append(t)
 
 	# Start a thread for policy eval task
-	monitor_thread = threading.Thread(target=lambda: pe.continuous_eval(FLAGS.eval_every, sess, coord))
-	monitor_thread.start()
+	# monitor_thread = threading.Thread(target=lambda: pe.continuous_eval(FLAGS.eval_every, sess, coord))
+	# monitor_thread.start()
 
 	# Wait for all workers to finish
 	coord.join(worker_threads)
