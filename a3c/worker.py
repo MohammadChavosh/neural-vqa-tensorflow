@@ -103,6 +103,7 @@ class Worker(object):
 					transitions, local_t, global_t = self.run_n_steps(t_max, sess)
 
 					if self.max_global_steps is not None and global_t >= self.max_global_steps:
+						print "Reached global step {}. Stopping.".format(global_t)
 						tf.logging.info("Reached global step {}. Stopping.".format(global_t))
 						coord.request_stop()
 						return
@@ -142,6 +143,7 @@ class Worker(object):
 			global_t = next(self.global_counter)
 
 			if local_t % 100 == 0:
+				print "{}: local Step {}, global step {}".format(self.name, local_t, global_t)
 				tf.logging.info("{}: local Step {}, global step {}".format(self.name, local_t, global_t))
 
 			if done:
