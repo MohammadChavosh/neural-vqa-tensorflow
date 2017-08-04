@@ -180,10 +180,10 @@ class Worker(object):
 			value_targets.append(reward)
 
 		feed_dict = {
-			self.policy_net.states: np.squeeze(np.array(states)),
+			self.policy_net.states: np.squeeze(np.array(states), axis=1),
 			self.policy_net.targets: policy_targets,
 			self.policy_net.actions: actions,
-			self.value_net.states: np.squeeze(np.array(states)),
+			self.value_net.states: np.squeeze(np.array(states), axis=1),
 			self.value_net.targets: value_targets,
 		}
 
