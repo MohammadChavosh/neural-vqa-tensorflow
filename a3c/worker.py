@@ -174,6 +174,7 @@ class Worker(object):
 			reward = transition.reward + self.discount_factor * reward
 			policy_target = (reward - self._value_net_predict(transition.state, sess))
 			# Accumulate updates
+			print transition.state.shape
 			states.append(transition.state)
 			actions.append(transition.action)
 			policy_targets.append(policy_target)
