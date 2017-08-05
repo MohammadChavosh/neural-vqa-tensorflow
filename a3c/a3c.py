@@ -89,7 +89,7 @@ with tf.device("/cpu:0"):
 	# Used to occasionally save videos for our policy net
 	# and write episode rewards to Tensorboard
 	pe = PolicyMonitor(
-		env=make_env(wrap=False),
+		env=make_env(),
 		policy_net=policy_net,
 		summary_writer=summary_writer,
 		saver=saver)
