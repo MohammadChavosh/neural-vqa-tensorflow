@@ -17,7 +17,7 @@ if import_path not in sys.path:
 	sys.path.append(import_path)
 
 from estimators import ValueEstimator, PolicyEstimator
-# from policy_monitor import PolicyMonitor
+from policy_monitor import PolicyMonitor
 from worker import Worker
 
 tf.flags.DEFINE_string("model_dir", "Data/a3c", "Directory to write Tensorboard summaries and videos to.")
@@ -88,11 +88,11 @@ with tf.device("/cpu:0"):
 
 	# Used to occasionally save videos for our policy net
 	# and write episode rewards to Tensorboard
-	# pe = PolicyMonitor(
-	# 	env=make_env(wrap=False),
-	# 	policy_net=policy_net,
-	# 	summary_writer=summary_writer,
-	# 	saver=saver)
+	pe = PolicyMonitor(
+		env=make_env(wrap=False),
+		policy_net=policy_net,
+		summary_writer=summary_writer,
+		saver=saver)
 
 with tf.Session() as sess:
 	sess.run(tf.global_variables_initializer())
@@ -100,6 +100,8 @@ with tf.Session() as sess:
 
 	# Load a previous checkpoint if it exists
 	latest_checkpoint = tf.train.latest_checkpoint(CHECKPOINT_DIR)
+	print 'checkpoint_dir: ', CHECKPOINT_DIR
+	print 'latest_checkpoint: ', latest_checkpoint
 	if latest_checkpoint:
 		print("Loading model checkpoint: {}".format(latest_checkpoint))
 		saver.restore(sess, latest_checkpoint)
@@ -113,8 +115,8 @@ with tf.Session() as sess:
 		worker_threads.append(t)
 
 	# Start a thread for policy eval task
-	# monitor_thread = threading.Thread(target=lambda: pe.continuous_eval(FLAGS.eval_every, sess, coord))
-	# monitor_thread.start()
+	monitor_thread = threading.Thread(target=lambda: pe.continuous_eval(FLAGS.eval_every, sess, coord))
+	monitor_thread.start()
 
 	# Wait for all workers to finish
 	coord.join(worker_threads)
