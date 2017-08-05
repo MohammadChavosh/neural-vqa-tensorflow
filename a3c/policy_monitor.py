@@ -52,7 +52,7 @@ class PolicyMonitor(object):
 			tf.contrib.slim.get_variables(scope="policy_eval", collection=tf.GraphKeys.TRAINABLE_VARIABLES))
 
 	def _policy_net_predict(self, state, sess):
-		feed_dict = {self.policy_net.states: [state]}
+		feed_dict = {self.policy_net.states: state}
 		preds = sess.run(self.policy_net.predictions, feed_dict)
 		return preds["probs"][0]
 
