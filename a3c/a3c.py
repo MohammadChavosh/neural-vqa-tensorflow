@@ -31,8 +31,7 @@ FLAGS = tf.flags.FLAGS
 
 
 def make_env():  # TODO: make env correctly
-	env = Environment('Data/train2014/COCO_train2014_000000465294.jpg', 'What is the name of fruit in the picture?', 'banana')
-	return env
+	return Environment()
 
 # Set the number of workers
 NUM_WORKERS = multiprocessing.cpu_count()
