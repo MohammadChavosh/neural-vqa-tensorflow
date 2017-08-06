@@ -29,8 +29,8 @@ class PolicyMonitor(object):
 
 	def __init__(self, env, policy_net, summary_writer, saver=None):
 
-		self.video_dir = os.path.join(summary_writer.get_logdir(), "../videos")
-		self.video_dir = os.path.abspath(self.video_dir)
+		# self.video_dir = os.path.join(summary_writer.get_logdir(), "../videos")
+		# self.video_dir = os.path.abspath(self.video_dir)
 
 		# self.env = Monitor(env, directory=self.video_dir, video_callable=lambda x: True, resume=True)
 		self.env = env
@@ -40,7 +40,7 @@ class PolicyMonitor(object):
 
 		self.checkpoint_path = os.path.abspath(os.path.join(summary_writer.get_logdir(), "../checkpoints/model"))
 
-		os.makedirs(self.video_dir)
+		# os.makedirs(self.video_dir)
 
 		# Local policy net
 		with tf.variable_scope("policy_eval"):

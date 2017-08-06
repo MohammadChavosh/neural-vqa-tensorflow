@@ -35,7 +35,7 @@ class Environment:
 
 	def action(self, action_type):
 		if action_type not in self.valid_actions():
-			action_type = 'None'
+			return self.MOVE_NEGATIVE_REWARD, False
 		img_size = self.img_array.shape
 		if action_type == 'Upper_Up':
 			self.crop_coordinates[0] = max(self.crop_coordinates[0] - self.x_alpha, 0)
