@@ -81,24 +81,24 @@ class Environment:
 		result = ['End']
 		if self.crop_coordinates[0] - self.x_alpha >= 0:
 			result.append('Upper_Up')
-		if (self.crop_coordinates[0] + self.x_alpha < self.crop_coordinates[2]) and \
+		if (self.crop_coordinates[0] + self.x_alpha + 1 < self.crop_coordinates[2]) and \
 				(self.crop_coordinates[0] + self.x_alpha <= img_size[0]):
 			result.append('Upper_Down')
 
 		if (self.crop_coordinates[2] - self.x_alpha >= 0) and \
-				(self.crop_coordinates[2] - self.x_alpha > self.crop_coordinates[0]):
+				(self.crop_coordinates[2] - self.x_alpha - 1 > self.crop_coordinates[0]):
 			result.append('Bottom_Up')
 		if self.crop_coordinates[2] + self.x_alpha <= img_size[0]:
 			result.append('Bottom_Down')
 
 		if self.crop_coordinates[1] - self.y_alpha >= 0:
 			result.append('Left_Left')
-		if (self.crop_coordinates[1] + self.y_alpha < self.crop_coordinates[3]) and \
+		if (self.crop_coordinates[1] + self.y_alpha + 1 < self.crop_coordinates[3]) and \
 				(self.crop_coordinates[1] + self.y_alpha <= img_size[1]):
 			result.append('Left_Right')
 
 		if self.crop_coordinates[3] - self.y_alpha >= 0 and \
-				(self.crop_coordinates[3] - self.y_alpha > self.crop_coordinates[1]):
+				(self.crop_coordinates[3] - self.y_alpha - 1 > self.crop_coordinates[1]):
 			result.append('Right_Left')
 		if self.crop_coordinates[3] + self.y_alpha <= img_size[1]:
 			result.append('Right_Right')
