@@ -192,6 +192,9 @@ def load_fc7_features(data_dir, split):
 
 
 def get_vqa_data(is_train, sampling_ratio=1):
+	vocab_data = get_question_answer_vocab(1, 'Data')
+	answer_vocab = vocab_data['answer_vocab']
+
 	if is_train:
 		annotations = json.load(open('Data/mscoco_train2014_annotations.json'))['annotations']
 		questions = json.load(open('Data/OpenEnded_mscoco_train2014_questions.json'))['questions']
@@ -202,6 +205,9 @@ def get_vqa_data(is_train, sampling_ratio=1):
 		images_path = 'Data/val2014/COCO_val2014_'
 	vqa_triplets = list()
 	for question, annotation in zip(questions, annotations):
+		answer = annotation['multiple_choice_answer']
+		if answer not in answer_vocab:
+			continue
 		if question['question_id'] != annotation['question_id']:
 			raise AssertionError("question id's are not equal")
 		q = question['question']
@@ -210,7 +216,7 @@ def get_vqa_data(is_train, sampling_ratio=1):
 		for i in range(12 - len(img_num)):
 			img_path += '0'
 		img_path += img_num + '.jpg'
-		vqa_triplets.append((q, annotation['multiple_choice_answer'], img_path))
+		vqa_triplets.append((q, answer, img_path))
 	if sampling_ratio < 1:
 		vqa_triplets = random.sample(vqa_triplets, int(round(len(vqa_triplets) * sampling_ratio)))
 	return vqa_triplets
