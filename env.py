@@ -16,6 +16,7 @@ class Environment:
 		question, answer, img_path = Environment.vqa_data[Environment.data_num]
 		Environment.data_num += 1
 		if Environment.data_num == len(Environment.vqa_data):
+			print "Total dataset passed once"
 			Environment.data_num = 0
 		self.img_array = load_image_array(img_path, False)
 		self.question = question
@@ -106,6 +107,14 @@ class Environment:
 		return result
 
 	def reset(self):
+		question, answer, img_path = Environment.vqa_data[Environment.data_num]
+		Environment.data_num += 1
+		if Environment.data_num == len(Environment.vqa_data):
+			print "Total dataset passed once"
+			Environment.data_num = 0
+		self.img_array = load_image_array(img_path, False)
+		self.question = question
+		self.answer = answer
 		img_size = self.img_array.shape
 		self.crop_coordinates = [0, 0, img_size[0], img_size[1]]
 		self.img_features = self.get_resized_region_image_features()
