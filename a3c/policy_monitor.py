@@ -86,7 +86,7 @@ class PolicyMonitor(object):
 			if self.saver is not None:
 				self.saver.save(sess, self.checkpoint_path)
 
-			print "Eval results at step {}: total_reward {}, episode_length {}".format(global_step, total_reward, episode_length)
+			print "Eval results at step {}: last_reward {}, total_reward {}, episode_length {}".format(global_step, reward, total_reward, episode_length)
 			tf.logging.info("Eval results at step {}: total_reward {}, episode_length {}".format(global_step, total_reward, episode_length))
 
 			return total_reward, episode_length
