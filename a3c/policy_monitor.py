@@ -64,6 +64,7 @@ class PolicyMonitor(object):
 			# Run an episode
 			done = False
 			self.env.reset()
+			accuracy = self.env.latest_accuracy
 			state = self.env.state
 			total_reward = 0.0
 			episode_length = 0
@@ -86,7 +87,7 @@ class PolicyMonitor(object):
 			if self.saver is not None:
 				self.saver.save(sess, self.checkpoint_path)
 
-			print "Eval results at step {}: last_reward {}, total_reward {}, episode_length {}".format(global_step, reward, total_reward, episode_length)
+			print "Eval results at step {}: first_accuracy {}, last_reward {}, total_reward {}, episode_length {}".format(global_step, accuracy, reward, total_reward, episode_length)
 			tf.logging.info("Eval results at step {}: total_reward {}, episode_length {}".format(global_step, total_reward, episode_length))
 
 			return total_reward, episode_length
