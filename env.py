@@ -17,7 +17,7 @@ class Environment:
 		question, answer, img_path = Environment.vqa_data[Environment.data_num]
 		Environment.data_num += 1
 		if Environment.data_num % 100 == 0:
-			print "{} number of {} data passed".format(Environment.data_num, len(Environment.data_num))
+			print "{} number of {} data passed".format(Environment.data_num, len(Environment.vqa_data))
 		if Environment.data_num == len(Environment.vqa_data):
 			print "Total dataset passed once"
 			Environment.data_num = 0
@@ -120,7 +120,7 @@ class Environment:
 		question, answer, img_path = Environment.vqa_data[Environment.data_num]
 		Environment.data_num += 1
 		if Environment.data_num % 100 == 0:
-			print "{} number of {} data passed".format(Environment.data_num, len(Environment.data_num))
+			print "{} number of {} data passed".format(Environment.data_num, len(Environment.vqa_data))
 		if Environment.data_num == len(Environment.vqa_data):
 			print "Total dataset passed once"
 			Environment.data_num = 0
