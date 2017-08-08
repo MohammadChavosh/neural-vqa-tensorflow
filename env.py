@@ -3,6 +3,7 @@ from scipy import misc
 from vqa_model import VQAModel
 from os.path import join
 from data_loader import get_vqa_data
+import numpy as np
 
 VALID_ACTIONS = ['End', 'Upper_Up', 'Upper_Down', 'Bottom_Up', 'Bottom_Down', 'Left_Left', 'Left_Right', 'Right_Left', 'Right_Right']
 
@@ -21,6 +22,7 @@ class Environment:
 		self.img_array = load_image_array(img_path, False)
 		self.question = question
 		self.answer = answer
+		self.steps = 0
 		img_size = self.img_array.shape
 		self.crop_coordinates = [0, 0, img_size[0], img_size[1]]
 		self.x_alpha = img_size[0] / 10.0
@@ -28,6 +30,7 @@ class Environment:
 		self.vqa_model = VQAModel()
 		self.img_features = self.get_resized_region_image_features()
 		self.latest_loss, self.latest_accuracy, self.state, _ = self.vqa_model.get_result(self.img_features, self.question, self.answer)
+		self.state = np.append(self.state, self.steps)
 
 		self.TRIGGER_NEGATIVE_REWARD = -3
 		self.TRIGGER_POSITIVE_REWARD = 3
@@ -35,6 +38,9 @@ class Environment:
 		self.MOVE_POSITIVE_REWARD = 1
 
 	def action(self, action_type):
+		self.steps += 1
+		if self.steps > 80:
+			return self.TRIGGER_NEGATIVE_REWARD * 2, True
 		if action_type not in self.valid_actions():
 			return self.MOVE_NEGATIVE_REWARD, False
 		img_size = self.img_array.shape
@@ -57,12 +63,14 @@ class Environment:
 		self.img_features = self.get_resized_region_image_features()
 		if action_type == 'End':
 			self.latest_loss, self.latest_accuracy, self.state, _ = self.vqa_model.get_result(self.img_features, self.question, self.answer)
+			self.state = np.append(self.state, self.steps)
 			if self.latest_accuracy < 0.1:
 				return self.TRIGGER_NEGATIVE_REWARD, True
 			if self.latest_accuracy > 0.9:
 				return self.TRIGGER_POSITIVE_REWARD, True
 		else:
 			loss, self.latest_accuracy, self.state, _ = self.vqa_model.get_result(self.img_features, self.question, self.answer)
+			self.state = np.append(self.state, self.steps)
 			if self.latest_loss > loss:
 				self.latest_loss = loss
 				return self.MOVE_POSITIVE_REWARD, False
@@ -115,7 +123,9 @@ class Environment:
 		self.img_array = load_image_array(img_path, False)
 		self.question = question
 		self.answer = answer
+		self.steps = 0
 		img_size = self.img_array.shape
 		self.crop_coordinates = [0, 0, img_size[0], img_size[1]]
 		self.img_features = self.get_resized_region_image_features()
 		self.latest_loss, self.latest_accuracy, self.state, _ = self.vqa_model.get_result(self.img_features, self.question, self.answer)
+		self.state = np.append(self.state, self.steps)
