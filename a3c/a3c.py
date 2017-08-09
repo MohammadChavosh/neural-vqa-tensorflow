@@ -119,4 +119,7 @@ with tf.Session() as sess:
 	monitor_thread.start()
 
 	# Wait for all workers to finish
-	coord.join(worker_threads)
+	if IS_TRAIN:
+		coord.join(worker_threads)
+	else:
+		coord.join(monitor_thread)

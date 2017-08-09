@@ -4,7 +4,7 @@ import numpy as np
 import tensorflow as tf
 import time
 from inspect import getsourcefile
-from env import VALID_ACTIONS, IS_TRAIN
+from env import VALID_ACTIONS, IS_TRAIN, Environment
 
 current_path = os.path.dirname(os.path.abspath(getsourcefile(lambda: 0)))
 import_path = os.path.abspath(os.path.join(current_path, "../.."))
@@ -110,5 +110,7 @@ class PolicyMonitor(object):
 					else:
 						accuracies.append(0.0)
 					print "Till now accuracy: {}".format(sum(accuracies) / len(accuracies))
+				if len(accuracies) == len(Environment.vqa_data):
+					break
 		except tf.errors.CancelledError:
 			return
