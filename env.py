@@ -6,14 +6,15 @@ from data_loader import get_vqa_data
 import numpy as np
 
 VALID_ACTIONS = ['End', 'Upper_Up', 'Upper_Down', 'Bottom_Up', 'Bottom_Down', 'Left_Left', 'Left_Right', 'Right_Left', 'Right_Right']
+IS_TRAIN = True
 
 
 class Environment:
 	feature_extractor = FeatureExtractor(join('Data', 'vgg16.tfmodel'))
-	vqa_data = get_vqa_data(True)
+	vqa_data = get_vqa_data(IS_TRAIN)
 	data_num = 0
 
-	def __init__(self):
+	def __init__(self, evaluation):
 		question, answer, img_path = Environment.vqa_data[Environment.data_num]
 		Environment.data_num += 1
 		if Environment.data_num % 100 == 0:

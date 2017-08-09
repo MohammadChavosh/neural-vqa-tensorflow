@@ -60,9 +60,7 @@ def main():
 		'q_vocab_size' : len(qa_data['question_vocab']),
 		'ans_vocab_size' : len(qa_data['answer_vocab'])
 	}
-	
-	
-	
+
 	model = vis_lstm_model.Vis_lstm_model(model_options)
 	input_tensors, t_prediction, t_ans_probab = model.build_generator()
 	sess = tf.InteractiveSession()

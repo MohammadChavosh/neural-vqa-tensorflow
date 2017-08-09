@@ -4,7 +4,7 @@ import numpy as np
 import tensorflow as tf
 import time
 from inspect import getsourcefile
-from env import VALID_ACTIONS
+from env import VALID_ACTIONS, IS_TRAIN
 
 current_path = os.path.dirname(os.path.abspath(getsourcefile(lambda: 0)))
 import_path = os.path.abspath(os.path.join(current_path, "../.."))
@@ -90,16 +90,25 @@ class PolicyMonitor(object):
 			print "Eval results at step {}: first_accuracy {}, last_reward {}, total_reward {}, episode_length {}".format(global_step, accuracy, reward, total_reward, episode_length)
 			tf.logging.info("Eval results at step {}: total_reward {}, episode_length {}".format(global_step, total_reward, episode_length))
 
-			return total_reward, episode_length
+			return total_reward, episode_length, reward
 
 	def continuous_eval(self, eval_every, sess, coord):
 		"""
 		Continuously evaluates the policy every [eval_every] seconds.
 		"""
+		if not IS_TRAIN:
+			accuracies = []
 		try:
 			while not coord.should_stop():
-				self.eval_once(sess)
+				_, _, reward = self.eval_once(sess)
 				# Sleep until next evaluation cycle
-				time.sleep(eval_every)
+				if IS_TRAIN:
+					time.sleep(eval_every)
+				else:
+					if reward == 3:
+						accuracies.append(1.0)
+					else:
+						accuracies.append(0.0)
+					print "Till now accuracy: {}".format(sum(accuracies) / len(accuracies))
 		except tf.errors.CancelledError:
 			return

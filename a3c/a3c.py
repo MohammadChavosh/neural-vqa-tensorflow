@@ -8,7 +8,7 @@ import shutil
 import threading
 import multiprocessing
 from inspect import getsourcefile
-from env import VALID_ACTIONS, Environment
+from env import VALID_ACTIONS, IS_TRAIN, Environment
 
 current_path = os.path.dirname(os.path.abspath(getsourcefile(lambda: 0)))
 import_path = os.path.abspath(os.path.join(current_path, "../.."))
@@ -30,7 +30,7 @@ tf.flags.DEFINE_integer("parallelism", None, "Number of threads to run. If not s
 FLAGS = tf.flags.FLAGS
 
 
-def make_env():  # TODO: make env correctly
+def make_env():
 	return Environment()
 
 # Set the number of workers
@@ -64,24 +64,25 @@ with tf.device("/cpu:0"):
 
 	# Create worker graphs
 	workers = []
-	for worker_id in range(NUM_WORKERS):
-		# We only write summaries in one of the workers because they're
-		# pretty much identical and writing them on all workers
-		# would be a waste of space
-		worker_summary_writer = None
-		if worker_id == 0:
-			worker_summary_writer = summary_writer
+	if IS_TRAIN:
+		for worker_id in range(NUM_WORKERS):
+			# We only write summaries in one of the workers because they're
+			# pretty much identical and writing them on all workers
+			# would be a waste of space
+			worker_summary_writer = None
+			if worker_id == 0:
+				worker_summary_writer = summary_writer
 
-		worker = Worker(
-			name="worker_{}".format(worker_id),
-			env=make_env(),
-			policy_net=policy_net,
-			value_net=value_net,
-			global_counter=global_counter,
-			discount_factor=0.99,
-			summary_writer=worker_summary_writer,
-			max_global_steps=FLAGS.max_global_steps)
-		workers.append(worker)
+			worker = Worker(
+				name="worker_{}".format(worker_id),
+				env=make_env(),
+				policy_net=policy_net,
+				value_net=value_net,
+				global_counter=global_counter,
+				discount_factor=0.99,
+				summary_writer=worker_summary_writer,
+				max_global_steps=FLAGS.max_global_steps)
+			workers.append(worker)
 
 	saver = tf.train.Saver(keep_checkpoint_every_n_hours=2.0, max_to_keep=10)
 
