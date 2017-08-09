@@ -27,12 +27,13 @@ class PolicyMonitor(object):
 	  summary_writer: a tf.train.SummaryWriter used to write Tensorboard summaries
 	"""
 
-	def __init__(self, env, policy_net, summary_writer, saver=None):
+	def __init__(self, name, env, policy_net, summary_writer, saver=None):
 
 		# self.video_dir = os.path.join(summary_writer.get_logdir(), "../videos")
 		# self.video_dir = os.path.abspath(self.video_dir)
 
 		# self.env = Monitor(env, directory=self.video_dir, video_callable=lambda x: True, resume=True)
+		self.name = name
 		self.env = env
 		self.global_policy_net = policy_net
 		self.summary_writer = summary_writer
@@ -87,7 +88,7 @@ class PolicyMonitor(object):
 			if self.saver is not None:
 				self.saver.save(sess, self.checkpoint_path)
 
-			print "Eval results at step {}: first_accuracy {}, last_reward {}, total_reward {}, episode_length {}".format(global_step, accuracy, reward, total_reward, episode_length)
+			print "Eval results at step {} for {}: first_accuracy {}, last_reward {}, total_reward {}, episode_length {}".format(global_step, self.name, accuracy, reward, total_reward, episode_length)
 			tf.logging.info("Eval results at step {}: total_reward {}, episode_length {}".format(global_step, total_reward, episode_length))
 
 			return total_reward, episode_length, reward
@@ -109,7 +110,7 @@ class PolicyMonitor(object):
 						accuracies.append(1.0)
 					else:
 						accuracies.append(0.0)
-					print "Till now accuracy: {}".format(sum(accuracies) / len(accuracies))
+					print "{} till now accuracy: {}".format(self.name, sum(accuracies) / len(accuracies))
 				if len(accuracies) == len(Environment.vqa_data):
 					break
 		except tf.errors.CancelledError:

@@ -88,11 +88,18 @@ with tf.device("/cpu:0"):
 
 	# Used to occasionally save videos for our policy net
 	# and write episode rewards to Tensorboard
-	pe = PolicyMonitor(
-		env=make_env(),
-		policy_net=policy_net,
-		summary_writer=summary_writer,
-		saver=saver)
+	monitors = []
+	if IS_TRAIN:
+		NUM_WORKERS = 1
+	for monitor_id in range(NUM_WORKERS):
+		pe = PolicyMonitor(
+			name="monitor_{}".format(monitor_id),
+			env=make_env(),
+			policy_net=policy_net,
+			summary_writer=summary_writer,
+			saver=saver)
+		monitors.append(pe)
+
 
 with tf.Session() as sess:
 	sess.run(tf.global_variables_initializer())
@@ -109,17 +116,19 @@ with tf.Session() as sess:
 	# Start worker threads
 	worker_threads = []
 	for worker in workers:
-		worker_fn = lambda: worker.run(sess, coord, FLAGS.t_max)
-		t = threading.Thread(target=worker_fn)
+		t = threading.Thread(target=lambda: worker.run(sess, coord, FLAGS.t_max))
 		t.start()
 		worker_threads.append(t)
 
 	# Start a thread for policy eval task
-	monitor_thread = threading.Thread(target=lambda: pe.continuous_eval(FLAGS.eval_every, sess, coord))
-	monitor_thread.start()
+	monitor_threads = []
+	for pe in monitors:
+		monitor_thread = threading.Thread(target=lambda: pe.continuous_eval(FLAGS.eval_every, sess, coord))
+		monitor_thread.start()
+		monitor_threads.append(monitor_thread)
 
 	# Wait for all workers to finish
 	if IS_TRAIN:
 		coord.join(worker_threads)
 	else:
-		coord.join([monitor_thread])
+		coord.join(monitor_threads)
