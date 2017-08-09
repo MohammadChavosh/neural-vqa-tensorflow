@@ -122,4 +122,4 @@ with tf.Session() as sess:
 	if IS_TRAIN:
 		coord.join(worker_threads)
 	else:
-		coord.join(monitor_thread)
+		coord.join([monitor_thread])
