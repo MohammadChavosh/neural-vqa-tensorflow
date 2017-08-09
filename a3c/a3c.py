@@ -89,15 +89,17 @@ with tf.device("/cpu:0"):
 	# Used to occasionally save videos for our policy net
 	# and write episode rewards to Tensorboard
 	monitors = []
+	passing_saver = None
 	if IS_TRAIN:
 		NUM_WORKERS = 1
+		passing_saver = saver
 	for monitor_id in range(NUM_WORKERS):
 		pe = PolicyMonitor(
 			name="monitor_{}".format(monitor_id),
 			env=make_env(),
 			policy_net=policy_net,
 			summary_writer=summary_writer,
-			saver=saver)
+			saver=passing_saver)
 		monitors.append(pe)
 
 

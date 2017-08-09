@@ -111,7 +111,7 @@ class PolicyMonitor(object):
 					else:
 						accuracies.append(0.0)
 					print "{} till now accuracy: {}".format(self.name, sum(accuracies) / len(accuracies))
-				if len(accuracies) == len(Environment.vqa_data):
+				if len(accuracies) > 100 and Environment.data_num < 50:
 					break
 		except tf.errors.CancelledError:
 			return
