@@ -14,7 +14,7 @@ class Environment:
 	vqa_data = get_vqa_data(IS_TRAIN)
 	data_num = 0
 
-	def __init__(self, evaluation):
+	def __init__(self):
 		question, answer, img_path = Environment.vqa_data[Environment.data_num]
 		Environment.data_num += 1
 		if Environment.data_num % 100 == 0:
