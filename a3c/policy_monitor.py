@@ -44,8 +44,8 @@ class PolicyMonitor(object):
 		# os.makedirs(self.video_dir)
 
 		# Local policy net
-		with tf.variable_scope("policy_eval"):
-			self.policy_net = PolicyEstimator(policy_net.num_outputs, reuse=(not IS_TRAIN), trainable=(not IS_TRAIN))
+		with tf.variable_scope(name):
+			self.policy_net = PolicyEstimator(policy_net.num_outputs)
 
 		# Op to copy params from global policy/value net parameters
 		self.copy_params_op = make_copy_params_op(
