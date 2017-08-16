@@ -94,8 +94,8 @@ with tf.device("/cpu:0"):
 		summary_writer=summary_writer,
 		saver=saver)
 
-
-with tf.Session() as sess:
+config = tf.ConfigProto(device_count={'GPU': 0})
+with tf.Session(config=config) as sess:
 	sess.run(tf.global_variables_initializer())
 	coord = tf.train.Coordinator()
 
