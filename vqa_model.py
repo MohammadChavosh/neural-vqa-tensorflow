@@ -9,7 +9,6 @@ class VQAModel:
 	data_dir = 'Data'
 	version = 1
 	vocab_data = data_loader.get_question_answer_vocab(version, data_dir)
-	ans_map = {vocab_data['answer_vocab'][ans]: ans for ans in vocab_data['answer_vocab']}
 
 	model_options = {
 		'num_lstm_layers': 2,
