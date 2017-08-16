@@ -17,6 +17,8 @@ def main():
 		print 'latest_loss: ', environment.latest_loss
 		print 'latest_accuracy: ', environment.latest_accuracy
 		print '----------------------'
+		with open("test.txt", "a") as f:
+				f.write('salam\n')
 
 
 if __name__ == '__main__':

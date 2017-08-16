@@ -104,7 +104,8 @@ class Worker(object):
 
 					if self.max_global_steps is not None and global_t >= self.max_global_steps:
 						print "Reached global step {}. Stopping.".format(global_t)
-						# tf.logging.info("Reached global step {}. Stopping.".format(global_t))
+						with open("worker.txt", "a") as f:
+							f.write("Reached global step {}. Stopping.\n".format(global_t))
 						coord.request_stop()
 						return
 
@@ -143,7 +144,8 @@ class Worker(object):
 
 			if local_t % 1000 == 0:
 				print "{}: local Step {}, global step {}".format(self.name, local_t, global_t)
-				# tf.logging.info("{}: local Step {}, global step {}".format(self.name, local_t, global_t))
+				with open("worker.txt", "a") as f:
+					f.write("{}: local Step {}, global step {}\n".format(self.name, local_t, global_t))
 
 			if done:
 				self.env.reset()

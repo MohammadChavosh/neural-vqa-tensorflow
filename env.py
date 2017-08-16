@@ -19,8 +19,9 @@ class Environment:
 		Environment.data_num += 1
 		if Environment.data_num % 100 == 0:
 			print "{} number of {} data passed".format(Environment.data_num, len(Environment.vqa_data))
+			with open("env_out.txt", "a") as f:
+				f.write("{} number of {} data passed\n".format(Environment.data_num, len(Environment.vqa_data)))
 		if Environment.data_num == len(Environment.vqa_data):
-			print "Total dataset passed once"
 			Environment.data_num = 0
 		self.img_array = load_image_array(img_path, False)
 		self.question = question
@@ -121,8 +122,9 @@ class Environment:
 		Environment.data_num += 1
 		if Environment.data_num % 100 == 0:
 			print "{} number of {} data passed".format(Environment.data_num, len(Environment.vqa_data))
+			with open("env_out.txt", "a") as f:
+				f.write("{} number of {} data passed\n".format(Environment.data_num, len(Environment.vqa_data)))
 		if Environment.data_num == len(Environment.vqa_data):
-			print "Total dataset passed once"
 			Environment.data_num = 0
 		self.img_array = load_image_array(img_path, False)
 		self.question = question
