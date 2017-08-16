@@ -29,8 +29,7 @@ class VQAModel:
 			model = vis_lstm_model.Vis_lstm_model(model_options)
 			self.input_tensors, self.loss, self.accuracy, self.lstm_answer, self.predictions = model.build_for_rl()
 		model_path = 'Data/Models/model199.ckpt'
-		config = tf.ConfigProto(device_count={'GPU': 0})
-		self.sess = tf.Session(graph=graph, config=config)
+		self.sess = tf.Session(graph=graph)
 		with self.sess.as_default():
 			with graph.as_default():
 				saver = tf.train.Saver()

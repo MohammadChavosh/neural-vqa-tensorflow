@@ -32,8 +32,7 @@ class FeatureExtractor:
 		self.images = tf.placeholder("float", [None, 224, 224, 3])
 		tf.import_graph_def(graph_def, input_map={"images": self.images})
 		self.graph = tf.get_default_graph()
-		config = tf.ConfigProto(device_count={'GPU': 0})
-		self.sess = tf.Session(graph=self.graph, config=config)
+		self.sess = tf.Session(graph=self.graph)
 
 	def extract_fc7_features(self, img_array):
 
