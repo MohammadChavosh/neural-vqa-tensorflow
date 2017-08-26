@@ -22,6 +22,7 @@ class Environment:
 		if Environment.data_num == len(Environment.vqa_data):
 			Environment.data_num = 0
 		self.img_array = load_image_array(img_path, False)
+		self.img_path = img_path
 		self.question = question
 		self.answer = answer
 		self.steps = 0
@@ -120,6 +121,7 @@ class Environment:
 		if Environment.data_num == len(Environment.vqa_data):
 			Environment.data_num = 0
 		self.img_array = load_image_array(img_path, False)
+		self.img_path = img_path
 		self.question = question
 		self.answer = answer
 		self.steps = 0
