@@ -102,13 +102,8 @@ with tf.Session() as sess:
 	latest_checkpoint = tf.train.latest_checkpoint(CHECKPOINT_DIR)
 	print 'checkpoint_dir: {}'.format(CHECKPOINT_DIR)
 	print 'latest_checkpoint: {}'.format(latest_checkpoint)
-	with open("a3c_out.txt", "a") as f:
-		f.write('checkpoint_dir: {}\n'.format(CHECKPOINT_DIR))
-		f.write('latest_checkpoint: {}\n'.format(latest_checkpoint))
 	if latest_checkpoint:
 		print("Loading model checkpoint: {}".format(latest_checkpoint))
-		with open("a3c_out.txt", "a") as f:
-			f.write("Loading model checkpoint: {}\n".format(latest_checkpoint))
 		saver.restore(sess, latest_checkpoint)
 
 	# Start worker threads

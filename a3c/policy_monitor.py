@@ -88,8 +88,6 @@ class PolicyMonitor(object):
 				self.saver.save(sess, self.checkpoint_path)
 
 			print "Eval results at step {}: first_accuracy {}, last_reward {}, total_reward {}, episode_length {}".format(global_step, accuracy, reward, total_reward, episode_length)
-			with open("monitor_out.txt", "a") as f:
-				f.write("Eval results at step {}: first_accuracy {}, last_reward {}, total_reward {}, episode_length {}\n".format(global_step, accuracy, reward, total_reward, episode_length))
 
 			return total_reward, episode_length, reward
 
@@ -111,8 +109,6 @@ class PolicyMonitor(object):
 					else:
 						accuracies.append(0.0)
 					print "Till now accuracy: {}".format(sum(accuracies) / len(accuracies))
-					with open("monitor_out.txt", "a") as f:
-						f.write("Till now accuracy: {}\n".format(sum(accuracies) / len(accuracies)))
 					if len(accuracies) == len(Environment.vqa_data):
 						break
 		except tf.errors.CancelledError:

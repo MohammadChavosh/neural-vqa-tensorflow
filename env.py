@@ -19,8 +19,6 @@ class Environment:
 		Environment.data_num += 1
 		if Environment.data_num % 100 == 0:
 			print "{} number of {} data passed".format(Environment.data_num, len(Environment.vqa_data))
-			with open("env_out.txt", "a") as f:
-				f.write("{} number of {} data passed\n".format(Environment.data_num, len(Environment.vqa_data)))
 		if Environment.data_num == len(Environment.vqa_data):
 			Environment.data_num = 0
 		self.img_array = load_image_array(img_path, False)
@@ -46,6 +44,11 @@ class Environment:
 			return self.TRIGGER_NEGATIVE_REWARD * 2, True
 		if action_type not in self.valid_actions():
 			return self.MOVE_NEGATIVE_REWARD, False
+		if action_type == 'End':
+			if self.latest_accuracy < 0.1:
+				return self.TRIGGER_NEGATIVE_REWARD, True
+			if self.latest_accuracy > 0.9:
+				return self.TRIGGER_POSITIVE_REWARD, True
 		img_size = self.img_array.shape
 		if action_type == 'Upper_Up':
 			self.crop_coordinates[0] = max(self.crop_coordinates[0] - self.x_alpha, 0)
@@ -64,22 +67,14 @@ class Environment:
 		if action_type == 'Right_Right':
 			self.crop_coordinates[3] = min(self.crop_coordinates[3] + self.y_alpha, img_size[1])
 		self.img_features = self.get_resized_region_image_features()
-		if action_type == 'End':
-			self.latest_loss, self.latest_accuracy, self.state, _ = VQAModel.get_result(self.img_features, self.question, self.answer)
-			self.state = np.concatenate((self.state, np.array([[(self.steps / 80.0)]])), axis=1)
-			if self.latest_accuracy < 0.1:
-				return self.TRIGGER_NEGATIVE_REWARD, True
-			if self.latest_accuracy > 0.9:
-				return self.TRIGGER_POSITIVE_REWARD, True
+		loss, self.latest_accuracy, self.state, _ = VQAModel.get_result(self.img_features, self.question, self.answer)
+		self.state = np.concatenate((self.state, np.array([[(self.steps / 80.0)]])), axis=1)
+		if self.latest_loss > loss:
+			self.latest_loss = loss
+			return self.MOVE_POSITIVE_REWARD, False
 		else:
-			loss, self.latest_accuracy, self.state, _ = VQAModel.get_result(self.img_features, self.question, self.answer)
-			self.state = np.concatenate((self.state, np.array([[(self.steps / 80.0)]])), axis=1)
-			if self.latest_loss > loss:
-				self.latest_loss = loss
-				return self.MOVE_POSITIVE_REWARD, False
-			else:
-				self.latest_loss = loss
-				return self.MOVE_NEGATIVE_REWARD, False
+			self.latest_loss = loss
+			return self.MOVE_NEGATIVE_REWARD, False
 
 	def get_resized_region_image_features(self):
 		rounded_coordinates = map(lambda x:int(round(x)), self.crop_coordinates)
@@ -122,8 +117,6 @@ class Environment:
 		Environment.data_num += 1
 		if Environment.data_num % 100 == 0:
 			print "{} number of {} data passed".format(Environment.data_num, len(Environment.vqa_data))
-			with open("env_out.txt", "a") as f:
-				f.write("{} number of {} data passed\n".format(Environment.data_num, len(Environment.vqa_data)))
 		if Environment.data_num == len(Environment.vqa_data):
 			Environment.data_num = 0
 		self.img_array = load_image_array(img_path, False)
