@@ -89,7 +89,7 @@ class PolicyMonitor(object):
 
 			print "Eval results at step {}: first_accuracy {}, last_reward {}, total_reward {}, episode_length {}".format(global_step, accuracy, reward, total_reward, episode_length)
 
-			return total_reward, episode_length, accuracy, reward, (self.env.img_path, self.env.question, self.env.answer)
+			return total_reward, accuracy, reward, (self.env.img_path, self.env.question, self.env.answer, episode_length)
 
 	def continuous_eval(self, eval_every, sess, coord):
 		"""
@@ -101,7 +101,7 @@ class PolicyMonitor(object):
 			wronged = 0
 		try:
 			while not coord.should_stop():
-				_, _, first_accuracy, reward, data = self.eval_once(sess)
+				_, first_accuracy, reward, data = self.eval_once(sess)
 				# Sleep until next evaluation cycle
 				if IS_TRAIN:
 					time.sleep(eval_every)
