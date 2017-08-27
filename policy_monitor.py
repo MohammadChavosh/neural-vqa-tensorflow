@@ -95,33 +95,31 @@ class PolicyMonitor(object):
 		"""
 		Continuously evaluates the policy every [eval_every] seconds.
 		"""
-		if not IS_TRAIN:
-			accuracies = []
-			episode_lengths = []
-			corrected = 0
-			wronged = 0
+		accuracies = []
+		episode_lengths = []
+		corrected = 0
+		wronged = 0
 		try:
 			while not coord.should_stop():
 				_, episode_length, first_accuracy, reward, data = self.eval_once(sess)
 				# Sleep until next evaluation cycle
 				if IS_TRAIN:
 					time.sleep(eval_every)
+				episode_lengths.append(episode_length)
+				if reward == 3:
+					accuracies.append(1.0)
 				else:
-					episode_lengths.append(episode_length)
-					if reward == 3:
-						accuracies.append(1.0)
-					else:
-						accuracies.append(0.0)
-					if reward == 3 and first_accuracy < 0.1:
-						corrected += 1
-						with open("corrections.txt", "a") as f:
-							f.write("Corrected data: {}\n".format(data))
-					elif reward == -3 and first_accuracy > 0.9:
-						wronged += 1
-						with open("wrongs.txt", "a") as f:
-							f.write("Wronged data: {}\n".format(data))
-					print "Till now accuracy: {}, corrected: {}, wronged: {}, improved: {}, processed: {}, avg_episode_length: {}".format(sum(accuracies) / len(accuracies), corrected, wronged, float(corrected - wronged) / len(accuracies), len(accuracies), float(sum(episode_lengths))/len(episode_lengths))
-					if len(accuracies) > Environment.data_num:
-						break
+					accuracies.append(0.0)
+				if reward == 3 and first_accuracy < 0.1:
+					corrected += 1
+					with open("corrections.txt", "a") as f:
+						f.write("Corrected data: {}\n".format(data))
+				elif reward == -3 and first_accuracy > 0.9:
+					wronged += 1
+					with open("wrongs.txt", "a") as f:
+						f.write("Wronged data: {}\n".format(data))
+				print "Till now accuracy: {}, corrected: {}, wronged: {}, improved: {}, processed: {}, avg_episode_length: {}".format(sum(accuracies) / len(accuracies), corrected, wronged, float(corrected - wronged) / len(accuracies), len(accuracies), float(sum(episode_lengths))/len(episode_lengths))
+				if (not IS_TRAIN) and (len(accuracies) > Environment.data_num):
+					break
 		except tf.errors.CancelledError:
 			return
