@@ -116,7 +116,7 @@ class PolicyMonitor(object):
 						corrected += 1
 						with open("corrections.txt", "a") as f:
 							f.write("Corrected data: {}\n".format(data))
-					elif reward == 0 and first_accuracy > 0.9:
+					elif reward == -3 and first_accuracy > 0.9:
 						wronged += 1
 						with open("wrongs.txt", "a") as f:
 							f.write("Wronged data: {}\n".format(data))
