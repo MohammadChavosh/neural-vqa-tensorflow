@@ -89,7 +89,7 @@ class PolicyMonitor(object):
 
 			print "Eval results at step {}: first_accuracy {}, last_reward {}, total_reward {}, episode_length {}".format(global_step, accuracy, reward, total_reward, episode_length)
 
-			return total_reward, accuracy, reward, (self.env.img_path, self.env.question, self.env.answer, episode_length)
+			return total_reward, episode_length, accuracy, reward, (self.env.img_path, self.env.question, self.env.answer, episode_length)
 
 	def continuous_eval(self, eval_every, sess, coord):
 		"""
@@ -97,15 +97,17 @@ class PolicyMonitor(object):
 		"""
 		if not IS_TRAIN:
 			accuracies = []
+			episode_lengths = []
 			corrected = 0
 			wronged = 0
 		try:
 			while not coord.should_stop():
-				_, first_accuracy, reward, data = self.eval_once(sess)
+				_, episode_length, first_accuracy, reward, data = self.eval_once(sess)
 				# Sleep until next evaluation cycle
 				if IS_TRAIN:
 					time.sleep(eval_every)
 				else:
+					episode_lengths.append(episode_length)
 					if reward == 3:
 						accuracies.append(1.0)
 					else:
@@ -118,8 +120,8 @@ class PolicyMonitor(object):
 						wronged += 1
 						with open("wrongs.txt", "a") as f:
 							f.write("Wronged data: {}\n".format(data))
-					print "Till now accuracy: {}, corrected: {}, wronged: {}, improved: {}, processed: {}".format(sum(accuracies) / len(accuracies), corrected, wronged, float(corrected - wronged) / len(accuracies), len(accuracies))
-					if len(accuracies) == len(Environment.vqa_data):
+					print "Till now accuracy: {}, corrected: {}, wronged: {}, improved: {}, processed: {}, avg_episode_length: {}".format(sum(accuracies) / len(accuracies), corrected, wronged, float(corrected - wronged) / len(accuracies), len(accuracies), float(sum(episode_lengths))/len(episode_lengths))
+					if len(accuracies) > Environment.data_num:
 						break
 		except tf.errors.CancelledError:
 			return
