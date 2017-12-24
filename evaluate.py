@@ -3,6 +3,7 @@ import vis_lstm_model
 import data_loader
 import argparse
 import numpy as np
+import json
 
 def main():
 	parser = argparse.ArgumentParser()
@@ -71,8 +72,9 @@ def main():
 	saver.restore(sess, args.model_path)
 	
 	batch_no = 0
+	result = []
 	while (batch_no*args.batch_size) < len(qa_data['validation']):
-		sentence, answer, fc7 = get_batch(batch_no, args.batch_size, 
+		sentence, answer, fc7, question_ids = get_batch(batch_no, args.batch_size, 
 			fc7_features, image_id_map, qa_data, 'val')
 		
 		pred, ans_prob = sess.run([t_prediction, t_ans_probab], feed_dict={
@@ -81,9 +83,12 @@ def main():
         })
 		
 		batch_no += 1
+		cnt = 0
 		if args.debug:
 			for idx, p in enumerate(pred):
-				print ans_map[p], ans_map[ np.argmax(answer[idx])]
+				# print ans_map[p], ans_map[ np.argmax(answer[idx])]
+				result.append({'answer': ans_map[p], 'question_id': question_ids[cnt]})
+				cnt += 1
 
 		correct_predictions = np.equal(pred, np.argmax(answer, 1))
 		correct_predictions = correct_predictions.astype('float32')
@@ -93,6 +98,8 @@ def main():
 		total += 1
 	
 	print "Acc", avg_accuracy/total
+    	my_list = list(result)
+    	dd = json.dump(my_list,open('result.json','w'))
 
 
 def get_batch(batch_no, batch_size, fc7_features, image_id_map, qa_data, split):
@@ -108,17 +115,19 @@ def get_batch(batch_no, batch_size, fc7_features, image_id_map, qa_data, split):
 	sentence = np.ndarray( (n, qa_data['max_question_length']), dtype = 'int32')
 	answer = np.zeros( (n, len(qa_data['answer_vocab'])))
 	fc7 = np.ndarray( (n,4096) )
+	question_ids = []
 
 	count = 0
 
 	for i in range(si, ei):
+		question_ids.append(qa[i]['question_id'])
 		sentence[count,:] = qa[i]['question'][:]
 		answer[count, qa[i]['answer']] = 1.0
 		fc7_index = image_id_map[ qa[i]['image_id'] ]
 		fc7[count,:] = fc7_features[fc7_index][:]
 		count += 1
 	
-	return sentence, answer, fc7
+	return sentence, answer, fc7, question_ids
 
 if __name__ == '__main__':
 	main()

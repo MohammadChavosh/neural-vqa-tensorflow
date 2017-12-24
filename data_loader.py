@@ -77,6 +77,7 @@ def load_questions_answers(version=2, data_dir='Data'):
 		if ans in answer_vocab:
 			val_data.append({
 				'image_id': v_answers['annotations'][i]['image_id'],
+				'question_id': question['question_id'],
 				'question': np.zeros(max_question_length),
 				'answer': answer_vocab[ans]
 			})
