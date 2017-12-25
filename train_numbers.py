@@ -70,8 +70,10 @@ def main():
 		'ans_vocab_size' : len(qa_data['answer_vocab'])
 	}
 
+	ans_size = 22
+
 	model = vis_lstm_model.Vis_lstm_model(model_options)
-	input_tensors, lstm_answer = model.build_numbers_model()
+	input_tensors, lstm_answer = model.build_numbers_model(ans_size)
 	sess = tf.InteractiveSession()
 	tf.initialize_all_variables().run()
 
@@ -79,7 +81,6 @@ def main():
 	if args.resume_model:
 		saver.restore(sess, args.resume_model)
 
-	ans_size = 22
 	ans_number_W = init_weight(model_options['rnn_size'], ans_size, name = 'ans_number_W')
 	ans_number_b = init_bias(ans_size, name='ans_number_b')
 	number_logits = tf.matmul(lstm_answer, ans_number_W) + ans_number_b

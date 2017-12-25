@@ -101,10 +101,10 @@ class Vis_lstm_model:
 		}
 		return input_tensors, loss, accuracy, predictions
 
-	def build_numbers_model(self):
+	def build_numbers_model(self, ans_size):
 		fc7_features = tf.placeholder('float32', [None, self.options['fc7_feature_length']], name='fc7')
 		sentence = tf.placeholder('int32', [None, self.options['lstm_steps'] - 1], name="sentence")
-		answer = tf.placeholder('float32', [None, self.options['ans_vocab_size']], name="answer")
+		answer = tf.placeholder('float32', [None, ans_size], name="answer")
 
 		word_embeddings = []
 		for i in range(self.options['lstm_steps']-1):
