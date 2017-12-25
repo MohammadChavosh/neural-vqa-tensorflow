@@ -61,8 +61,11 @@ def load_questions_answers(version=2, data_dir='Data'):
 		if ans in answer_vocab:
 			training_data.append({
 				'image_id': t_answers['annotations'][i]['image_id'],
+				'question_id': question['question_id'],
 				'question': np.zeros(max_question_length),
-				'answer': answer_vocab[ans]
+				'question_type': question['question_type'],
+				'answer': answer_vocab[ans],
+				'ans_str': ans
 			})
 			question_words = re.findall(word_regex, question['question'])
 
@@ -79,7 +82,9 @@ def load_questions_answers(version=2, data_dir='Data'):
 				'image_id': v_answers['annotations'][i]['image_id'],
 				'question_id': question['question_id'],
 				'question': np.zeros(max_question_length),
-				'answer': answer_vocab[ans]
+				'question_type': question['question_type'],
+				'answer': answer_vocab[ans],
+				'ans_str': ans
 			})
 			question_words = re.findall(word_regex, question['question'])
 

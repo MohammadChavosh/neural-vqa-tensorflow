@@ -101,6 +101,33 @@ class Vis_lstm_model:
 		}
 		return input_tensors, loss, accuracy, predictions
 
+	def build_numbers_model(self):
+		fc7_features = tf.placeholder('float32', [None, self.options['fc7_feature_length']], name='fc7')
+		sentence = tf.placeholder('int32', [None, self.options['lstm_steps'] - 1], name="sentence")
+		answer = tf.placeholder('float32', [None, self.options['ans_vocab_size']], name="answer")
+
+		word_embeddings = []
+		for i in range(self.options['lstm_steps']-1):
+			word_emb = tf.nn.embedding_lookup(self.Wemb, sentence[:,i])
+			word_emb = tf.nn.dropout(word_emb, self.options['word_emb_dropout'], name = "word_emb" + str(i))
+			word_embeddings.append(word_emb)
+
+		image_embedding = tf.matmul(fc7_features, self.Wimg) + self.bimg
+		image_embedding = tf.nn.tanh(image_embedding)
+		image_embedding = tf.nn.dropout(image_embedding, self.options['image_dropout'], name = "vis_features")
+
+		# Image as the last word in the lstm
+		word_embeddings.append(image_embedding)
+		lstm_output = self.forward_pass_lstm(word_embeddings)
+		lstm_answer = lstm_output[-1]
+
+		input_tensors = {
+			'fc7': fc7_features,
+			'sentence': sentence,
+			'answer': answer
+		}
+		return input_tensors, lstm_answer
+
 	def build_generator(self):
 		fc7_features = tf.placeholder('float32',[None, self.options['fc7_feature_length']], name='fc7')
 		sentence = tf.placeholder('int32',[None, self.options['lstm_steps'] - 1], name="sentence")
