@@ -74,14 +74,13 @@ def main():
 	model = vis_lstm_model.Vis_lstm_model(model_options)
 	input_tensors, lstm_answer = model.build_numbers_generator()
 
-	with tf.device('/cpu:0'):
-		ans_number_W = init_weight(model_options['rnn_size'], ans_size, name='ans_number_W')
-		ans_number_b = init_bias(ans_size, name='ans_number_b')
-		number_logits = tf.matmul(lstm_answer, ans_number_W) + ans_number_b
+	ans_number_W = init_weight(model_options['rnn_size'], ans_size, name='ans_number_W')
+	ans_number_b = init_bias(ans_size, name='ans_number_b')
+	number_logits = tf.matmul(lstm_answer, ans_number_W) + ans_number_b
 
-		answer_probability = tf.nn.sigmoid(number_logits, name='number_answer_probab')
-		tmp_indices = tf.equal(tf.less(0.6, answer_probability), True)
-		number_prediction = tf.map_fn(index1dTrue, tmp_indices, dtype=tf.int64)
+	answer_probability = tf.nn.sigmoid(number_logits, name='number_answer_probab')
+	tmp_indices = tf.equal(tf.less(0.6, answer_probability), True)
+	number_prediction = tf.map_fn(index1dTrue, tmp_indices, dtype=tf.int64)
 
 	sess = tf.InteractiveSession()
 	saver = tf.train.Saver()
