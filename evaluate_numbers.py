@@ -153,6 +153,7 @@ def get_batch(batch_no, batch_size, fc7_features, image_id_map, qa_data, split):
 	count = 0
 
 	for i in range(si, ei):
+		question_ids.append(qa[i]['question_id'])
 		sentence[count, :] = qa[i]['question'][:]
 		if qa[i]['ans_str'] in manualMap:
 			qa[i]['ans_str'] = manualMap[qa[i]['ans_str']]
