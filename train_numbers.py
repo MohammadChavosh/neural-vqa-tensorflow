@@ -103,7 +103,7 @@ def main():
 
 	# tmp_ans_indices = tf.where(tf.equal(input_tensors['answer'], 1))
 	# correct_ans = tf.segment_max(tmp_ans_indices[:, 1], tmp_ans_indices[:, 0])
-	correct_ans = tf.reduce_sum(input_tensors['answer'])
+	correct_ans = tf.map_fn(index1dOne, input_tensors['answer'], dtype=tf.int64)
 	correct_predictions = tf.equal(correct_ans, number_prediction)
 	accuracy = tf.reduce_mean(tf.cast(correct_predictions, tf.float32))
 
