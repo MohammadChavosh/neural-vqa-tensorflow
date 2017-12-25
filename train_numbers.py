@@ -78,7 +78,7 @@ def main():
 		'ans_vocab_size' : len(qa_data['answer_vocab'])
 	}
 
-	ans_size = 22
+	ans_size = 21
 
 	model = vis_lstm_model.Vis_lstm_model(model_options)
 	input_tensors, lstm_answer = model.build_numbers_model(ans_size)
@@ -181,7 +181,7 @@ def get_training_batch(batch_no, batch_size, fc7_features, image_id_map, qa_data
 		sentence[count, :] = qa[i]['question'][:]
 		if qa[i]['ans_str'] in manualMap:
 			qa[i]['ans_str'] = manualMap[qa[i]['ans_str']]
-		ans_digit = 0
+		ans_digit = -1
 		if qa[i]['ans_str'].isdigit():
 			ans_digit = int(qa[i]['ans_str'])
 			if ans_digit > 20:
