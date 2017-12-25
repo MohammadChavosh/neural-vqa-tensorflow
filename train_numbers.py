@@ -106,7 +106,8 @@ def main():
 				new_qa.append(q)
 		qa_data[_type] = new_qa
 
-	tf.initialize_variables([train_op, ans_number_W, ans_number_b]).run()
+	init_new_vars_op = tf.initialize_variables([train_op, ans_number_W, ans_number_b])
+	sess.run(init_new_vars_op)
 	for i in xrange(args.epochs):
 		batch_no = 0
 
