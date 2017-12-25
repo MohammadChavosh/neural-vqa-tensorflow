@@ -156,6 +156,29 @@ class Vis_lstm_model:
 
 		return input_tensors, predictions, answer_probab
 
+	def build_numbers_generator(self):
+		fc7_features = tf.placeholder('float32',[None, self.options['fc7_feature_length']], name='fc7')
+		sentence = tf.placeholder('int32',[None, self.options['lstm_steps'] - 1], name="sentence")
+
+		word_embeddings = []
+		for i in range(self.options['lstm_steps']-1):
+			word_emb = tf.nn.embedding_lookup(self.Wemb, sentence[:,i])
+			word_embeddings.append(word_emb)
+
+		image_embedding = tf.matmul(fc7_features, self.Wimg) + self.bimg
+		image_embedding = tf.nn.tanh(image_embedding)
+
+		word_embeddings.append(image_embedding)
+		lstm_output = self.forward_pass_lstm(word_embeddings)
+		lstm_answer = lstm_output[-1]
+
+		input_tensors = {
+			'fc7': fc7_features,
+			'sentence': sentence
+		}
+
+		return input_tensors, lstm_answer
+
 	def build_for_rl(self):
 		fc7_features = tf.placeholder('float32',[None, self.options['fc7_feature_length']], name='fc7')
 		sentence = tf.placeholder('int32',[None, self.options['lstm_steps'] - 1], name="sentence")

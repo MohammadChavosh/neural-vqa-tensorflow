@@ -98,8 +98,8 @@ def main():
 		total += 1
 	
 	print "Acc", avg_accuracy/total
-    	my_list = list(result)
-    	dd = json.dump(my_list,open('result.json','w'))
+	my_list = list(result)
+	json.dump(my_list,open('result.json','w'))
 
 
 def get_batch(batch_no, batch_size, fc7_features, image_id_map, qa_data, split):

@@ -3,7 +3,7 @@ import vis_lstm_model
 import data_loader
 import argparse
 import numpy as np
-import math
+import json
 
 
 def init_weight(dim_in, dim_out, name=None, stddev=1.0):
@@ -46,17 +46,25 @@ def main():
                        help='Expochs')
 	parser.add_argument('--debug', type=bool, default=False,
                        help='Debug')
-	parser.add_argument('--resume_model', type=str, default=None,
-                       help='Trained Model Path')
+	parser.add_argument('--model_path', type=str, default = 'Data/Models/model21.ckpt',
+                       help='Model Path')
 	parser.add_argument('--version', type=int, default=2,
                        help='VQA data version')
 
 	args = parser.parse_args()
 	print "Reading QA DATA"
+	# qa_data = data_loader.load_questions_answers(args)
 	qa_data = data_loader.load_questions_answers(args.version, args.data_dir)
-	
+
+	for _type in ['training', 'validation']:
+		new_qa = []
+		for q in qa_data[_type]:
+			if q['answer_type'] == 'number':
+				new_qa.append(q)
+		qa_data[_type] = new_qa
+
 	print "Reading fc7 features"
-	fc7_features, image_id_list = data_loader.load_fc7_features(args.data_dir, 'train')
+	fc7_features, image_id_list = data_loader.load_fc7_features(args.data_dir, 'val')
 	print "FC7 features", fc7_features.shape
 	print "image_id_list", image_id_list.shape
 
@@ -64,7 +72,7 @@ def main():
 	for i in xrange(len(image_id_list)):
 		image_id_map[ image_id_list[i] ] = i
 
-	ans_map = {qa_data['answer_vocab'][ans]: ans for ans in qa_data['answer_vocab']}
+	ans_map = { qa_data['answer_vocab'][ans] : ans for ans in qa_data['answer_vocab']}
 
 	model_options = {
 		'num_lstm_layers' : args.num_lstm_layers,
@@ -81,77 +89,60 @@ def main():
 	ans_size = 22
 
 	model = vis_lstm_model.Vis_lstm_model(model_options)
-	input_tensors, lstm_answer = model.build_numbers_model(ans_size)
-	sess = tf.InteractiveSession()
-	tf.initialize_all_variables().run()
-
-	saver = tf.train.Saver()
-	if args.resume_model:
-		saver.restore(sess, args.resume_model)
-
+	input_tensors, lstm_answer = model.build_numbers_generator()
 	ans_number_W = init_weight(model_options['rnn_size'], ans_size, name = 'ans_number_W')
 	ans_number_b = init_bias(ans_size, name='ans_number_b')
 	number_logits = tf.matmul(lstm_answer, ans_number_W) + ans_number_b
-
-	number_ce = tf.nn.sigmoid_cross_entropy_with_logits(labels=input_tensors['answer'], logits=number_logits, name='number_ce')
-	number_loss = tf.reduce_sum(number_ce, name='number_loss')
 
 	answer_probability = tf.nn.sigmoid(number_logits, name='number_answer_probab')
 	tmp_indices = tf.equal(tf.less(0.6, answer_probability), True)
 	number_prediction = tf.map_fn(index1dTrue, tmp_indices, dtype=tf.int64)
 
-	correct_ans = tf.map_fn(index1dOne, input_tensors['answer'], dtype=tf.int64)
-	correct_predictions = tf.equal(correct_ans, number_prediction)
-	number_accuracy = tf.reduce_mean(tf.cast(correct_predictions, tf.float32))
+	sess = tf.InteractiveSession()
+	saver = tf.train.Saver()
 
-	optimizer = tf.train.MomentumOptimizer(args.learning_rate, 0.95)
-	var_list = [ans_number_W, ans_number_b]
-	train_op = optimizer.minimize(number_loss, var_list=var_list)
-	reset_opt_op = tf.variables_initializer([optimizer.get_slot(var, name) for name in optimizer.get_slot_names() for var in var_list])
-	sess.run(reset_opt_op)
-
-	for _type in ['training', 'validation']:
-		new_qa = []
-		for q in qa_data[_type]:
-			if q['answer_type'] == 'number':
-				new_qa.append(q)
-		qa_data[_type] = new_qa
-
-	init_new_vars_op = tf.initialize_variables([ans_number_W, ans_number_b])
-	sess.run(init_new_vars_op)
-	for i in xrange(args.epochs):
-		batch_no = 0
-
-		while (batch_no*args.batch_size) < len(qa_data['training']):
-			sentence, answer, fc7 = get_training_batch(batch_no, args.batch_size, fc7_features, image_id_map, qa_data, 'train', ans_size)
-			_, loss_value, accuracy, pred = sess.run([train_op, number_loss, number_accuracy, number_prediction],
-				feed_dict={
-					input_tensors['fc7']:fc7,
-					input_tensors['sentence']:sentence,
-					input_tensors['answer']:answer
-				}
-			)
-			batch_no += 1
-			if args.debug:
-				for idx, p in enumerate(pred):
-					print ans_map[p], ans_map[ np.argmax(answer[idx])]
-
-				print "Loss", loss_value, batch_no, i
-				print "Accuracy", accuracy
-				print "---------------"
-			else:
-				print "Loss", loss_value, batch_no, i
-				print "Training Accuracy", accuracy
-			
-		save_path = saver.save(sess, "Data/NumberModels/model{}.ckpt".format(i))
+	avg_accuracy = 0.0
+	total = 0
+	saver.restore(sess, args.model_path)
+	
+	batch_no = 0
+	result = []
+	while (batch_no*args.batch_size) < len(qa_data['validation']):
+		sentence, answer, fc7, question_ids = get_batch(batch_no, args.batch_size, 
+			fc7_features, image_id_map, qa_data, 'val')
 		
+		pred = sess.run([number_prediction], feed_dict={
+            input_tensors['fc7']:fc7,
+            input_tensors['sentence']:sentence,
+        })
+		
+		batch_no += 1
+		cnt = 0
+		if args.debug:
+			for idx, p in enumerate(pred):
+				# print ans_map[p], ans_map[ np.argmax(answer[idx])]
+				result.append({'answer': ans_map[p], 'question_id': question_ids[cnt]})
+				cnt += 1
 
-def get_training_batch(batch_no, batch_size, fc7_features, image_id_map, qa_data, split, ans_size):
+		correct_predictions = np.equal(pred, np.argmax(answer, 1))
+		correct_predictions = correct_predictions.astype('float32')
+		accuracy = correct_predictions.mean()
+		print "Acc", accuracy
+		avg_accuracy += accuracy
+		total += 1
+	
+	print "Acc", avg_accuracy/total
+	my_list = list(result)
+	json.dump(my_list,open('result.json','w'))
+
+
+def get_batch(batch_no, batch_size, fc7_features, image_id_map, qa_data, split):
 	qa = None
 	if split == 'train':
 		qa = qa_data['training']
 	else:
 		qa = qa_data['validation']
+
 
 	manualMap = {'none': '0',
 	             'zero': '0',
@@ -167,13 +158,16 @@ def get_training_batch(batch_no, batch_size, fc7_features, image_id_map, qa_data
 	             'ten': '10'
 	             }
 
-	si = (batch_no * batch_size) % len(qa)
+	si = (batch_no * batch_size)%len(qa)
 	ei = min(len(qa), si + batch_size)
 	n = ei - si
-	sentence = np.ndarray((n, qa_data['max_question_length']), dtype='int32')
-	answer = np.zeros((n, ans_size))
-	fc7 = np.ndarray((n, 4096))
+	sentence = np.ndarray( (n, qa_data['max_question_length']), dtype = 'int32')
+	answer = np.zeros( (n, len(qa_data['answer_vocab'])))
+	fc7 = np.ndarray( (n,4096) )
+	question_ids = []
+
 	count = 0
+
 	for i in range(si, ei):
 		sentence[count, :] = qa[i]['question'][:]
 		if qa[i]['ans_str'] in manualMap:
@@ -189,7 +183,7 @@ def get_training_batch(batch_no, batch_size, fc7_features, image_id_map, qa_data
 		fc7[count, :] = fc7_features[fc7_index][:]
 		count += 1
 	
-	return sentence, answer, fc7
+	return sentence, answer, fc7, question_ids
 
 if __name__ == '__main__':
 	main()
