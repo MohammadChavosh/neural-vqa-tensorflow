@@ -99,14 +99,11 @@ def main():
 
 	train_op = tf.train.AdamOptimizer(args.learning_rate).minimize(number_loss)
 
-	for _type in qa_data:
+	for _type in ['training', 'validation']:
 		new_qa = []
 		for q in qa_data[_type]:
-			try:
-				if q['answer_type'] == 'number':
-					new_qa.append(q)
-			except TypeError:
-				print "error question:", q
+			if q['answer_type'] == 'number':
+				new_qa.append(q)
 		qa_data[_type] = new_qa
 
 	for i in xrange(args.epochs):
