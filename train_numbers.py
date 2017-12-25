@@ -89,20 +89,21 @@ def main():
 	if args.resume_model:
 		saver.restore(sess, args.resume_model)
 
-	ans_number_W = init_weight(model_options['rnn_size'], ans_size, name = 'ans_number_W')
-	ans_number_b = init_bias(ans_size, name='ans_number_b')
-	number_logits = tf.matmul(lstm_answer, ans_number_W) + ans_number_b
+	with tf.device('/cpu:0'):
+		ans_number_W = init_weight(model_options['rnn_size'], ans_size, name = 'ans_number_W')
+		ans_number_b = init_bias(ans_size, name='ans_number_b')
+		number_logits = tf.matmul(lstm_answer, ans_number_W) + ans_number_b
 
-	number_ce = tf.nn.sigmoid_cross_entropy_with_logits(labels=input_tensors['answer'], logits=number_logits, name='number_ce')
-	number_loss = tf.reduce_sum(number_ce, name='number_loss')
+		number_ce = tf.nn.sigmoid_cross_entropy_with_logits(labels=input_tensors['answer'], logits=number_logits, name='number_ce')
+		number_loss = tf.reduce_sum(number_ce, name='number_loss')
 
-	answer_probability = tf.nn.sigmoid(number_logits, name='number_answer_probab')
-	tmp_indices = tf.equal(tf.less(0.6, answer_probability), True)
-	number_prediction = tf.map_fn(index1dTrue, tmp_indices, dtype=tf.int64)
+		answer_probability = tf.nn.sigmoid(number_logits, name='number_answer_probab')
+		tmp_indices = tf.equal(tf.less(0.6, answer_probability), True)
+		number_prediction = tf.map_fn(index1dTrue, tmp_indices, dtype=tf.int64)
 
-	correct_ans = tf.map_fn(index1dOne, input_tensors['answer'], dtype=tf.int64)
-	correct_predictions = tf.equal(correct_ans, number_prediction)
-	number_accuracy = tf.reduce_mean(tf.cast(correct_predictions, tf.float32))
+		correct_ans = tf.map_fn(index1dOne, input_tensors['answer'], dtype=tf.int64)
+		correct_predictions = tf.equal(correct_ans, number_prediction)
+		number_accuracy = tf.reduce_mean(tf.cast(correct_predictions, tf.float32))
 
 	optimizer = tf.train.MomentumOptimizer(args.learning_rate, 0.95)
 	var_list = [ans_number_W, ans_number_b]
