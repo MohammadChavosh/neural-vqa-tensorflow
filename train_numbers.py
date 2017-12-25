@@ -102,7 +102,7 @@ def main():
 	for _type in qa_data:
 		new_qa = []
 		for q in qa_data[_type]:
-			if q['question_type'] == 'number':
+			if q['answer_type'] == 'number':
 				new_qa.append(q)
 		qa_data[_type] = new_qa
 
