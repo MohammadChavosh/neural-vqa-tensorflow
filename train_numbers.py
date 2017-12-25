@@ -97,6 +97,14 @@ def main():
 	accuracy = tf.reduce_mean(tf.cast(correct_predictions, tf.float32))
 
 	train_op = tf.train.AdamOptimizer(args.learning_rate).minimize(number_loss)
+
+	for _type in qa_data:
+		new_qa = []
+		for q in qa_data[_type]:
+			if q['question_type'] == 'number':
+				new_qa.append(q)
+		qa_data[_type] = new_qa
+
 	for i in xrange(args.epochs):
 		batch_no = 0
 
@@ -130,12 +138,6 @@ def get_training_batch(batch_no, batch_size, fc7_features, image_id_map, qa_data
 		qa = qa_data['training']
 	else:
 		qa = qa_data['validation']
-
-	new_qa = []
-	for q in qa:
-		if q['question_type'] == 'number':
-			new_qa.append(q)
-	qa = new_qa
 
 	manualMap = {'none': '0',
 	             'zero': '0',
