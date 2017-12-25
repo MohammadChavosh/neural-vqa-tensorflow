@@ -81,7 +81,7 @@ def main():
 	ans_size = 22
 
 	model = vis_lstm_model.Vis_lstm_model(model_options)
-	inp_tensors, lstm_answer = model.build_numbers_model(ans_size)
+	input_tensors, lstm_answer = model.build_numbers_model(ans_size)
 	sess = tf.InteractiveSession()
 	tf.initialize_all_variables().run()
 
@@ -93,7 +93,7 @@ def main():
 	ans_number_b = init_bias(ans_size, name='ans_number_b')
 	number_logits = tf.matmul(lstm_answer, ans_number_W) + ans_number_b
 
-	number_ce = tf.nn.sigmoid_cross_entropy_with_logits(labels=inp_tensors['answer'], logits=number_logits, name='number_ce')
+	number_ce = tf.nn.sigmoid_cross_entropy_with_logits(labels=input_tensors['answer'], logits=number_logits, name='number_ce')
 	number_loss = tf.reduce_sum(number_ce, name='number_loss')
 
 	answer_probability = tf.nn.sigmoid(number_logits, name='number_answer_probab')
@@ -101,11 +101,11 @@ def main():
 	# number_prediction = tf.segment_min(tmp_indices[:, 1], tmp_indices[:, 0])
 	number_prediction = tf.map_fn(index1dTrue, answer_probability, dtype=tf.int64)
 
-	# tmp_ans_indices = tf.where(tf.equal(inp_tensors['answer'], 1))
+	# tmp_ans_indices = tf.where(tf.equal(input_tensors['answer'], 1))
 	# correct_ans = tf.segment_max(tmp_ans_indices[:, 1], tmp_ans_indices[:, 0])
-	correct_ans = tf.map_fn(index1dOne, inp_tensors['answer'], dtype=tf.int64)
+	correct_ans = tf.map_fn(index1dOne, input_tensors['answer'], dtype=tf.int64)
 	correct_predictions = tf.equal(correct_ans, number_prediction)
-	accuracy = tf.reduce_mean(tf.cast(correct_predictions, tf.float32))
+	number_accuracy = tf.reduce_mean(tf.cast(correct_predictions, tf.float32))
 
 	optimizer = tf.train.MomentumOptimizer(args.learning_rate, 0.95)
 	var_list = [ans_number_W, ans_number_b]
@@ -127,11 +127,11 @@ def main():
 
 		while (batch_no*args.batch_size) < len(qa_data['training']):
 			sentence, answer, fc7 = get_training_batch(batch_no, args.batch_size, fc7_features, image_id_map, qa_data, 'train', ans_size)
-			_, loss_value, accuracy, pred = sess.run([train_op, number_loss, accuracy, number_prediction],
+			_, loss_value, accuracy, pred = sess.run([train_op, number_loss, number_accuracy, number_prediction],
 				feed_dict={
-					inp_tensors['fc7']:fc7,
-					inp_tensors['sentence']:sentence,
-					inp_tensors['answer']:answer
+					input_tensors['fc7']:fc7,
+					input_tensors['sentence']:sentence,
+					input_tensors['answer']:answer
 				}
 			)
 			batch_no += 1
