@@ -78,7 +78,7 @@ def main():
 		'ans_vocab_size' : len(qa_data['answer_vocab'])
 	}
 
-	ans_size = 21
+	ans_size = 22
 
 	model = vis_lstm_model.Vis_lstm_model(model_options)
 	input_tensors, lstm_answer = model.build_numbers_model(ans_size)
@@ -103,7 +103,7 @@ def main():
 
 	# tmp_ans_indices = tf.where(tf.equal(input_tensors['answer'], 1))
 	# correct_ans = tf.segment_max(tmp_ans_indices[:, 1], tmp_ans_indices[:, 0])
-	correct_ans = tf.map_fn(index1dOne, input_tensors['answer'], dtype=tf.int64)
+	correct_ans = tf.reduce_sum(input_tensors['answer'])
 	correct_predictions = tf.equal(correct_ans, number_prediction)
 	accuracy = tf.reduce_mean(tf.cast(correct_predictions, tf.float32))
 
@@ -181,7 +181,7 @@ def get_training_batch(batch_no, batch_size, fc7_features, image_id_map, qa_data
 		sentence[count, :] = qa[i]['question'][:]
 		if qa[i]['ans_str'] in manualMap:
 			qa[i]['ans_str'] = manualMap[qa[i]['ans_str']]
-		ans_digit = -1
+		ans_digit = 0
 		if qa[i]['ans_str'].isdigit():
 			ans_digit = int(qa[i]['ans_str'])
 			if ans_digit > 20:
