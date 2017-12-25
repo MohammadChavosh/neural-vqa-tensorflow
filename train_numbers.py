@@ -97,7 +97,7 @@ def main():
 	correct_predictions = tf.equal(correct_ans, number_prediction)
 	accuracy = tf.reduce_mean(tf.cast(correct_predictions, tf.float32))
 
-	train_op = tf.train.AdamOptimizer(args.learning_rate).minimize(number_loss)
+	train_op = tf.train.AdamOptimizer(args.learning_rate).minimize(number_loss, var_list=[ans_number_W, ans_number_b])
 
 	for _type in ['training', 'validation']:
 		new_qa = []
@@ -106,6 +106,7 @@ def main():
 				new_qa.append(q)
 		qa_data[_type] = new_qa
 
+	tf.initialize_variables([train_op, ans_number_W, ans_number_b]).run()
 	for i in xrange(args.epochs):
 		batch_no = 0
 
