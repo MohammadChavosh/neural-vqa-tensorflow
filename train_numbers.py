@@ -97,8 +97,11 @@ def main():
 	correct_predictions = tf.equal(correct_ans, number_prediction)
 	accuracy = tf.reduce_mean(tf.cast(correct_predictions, tf.float32))
 
-	optimizer = tf.train.AdamOptimizer(args.learning_rate)
-	train_op = optimizer.minimize(number_loss, var_list=[ans_number_W, ans_number_b])
+	optimizer = tf.train.MomentumOptimizer(args.learning_rate, 0.95)
+	var_list = [ans_number_W, ans_number_b]
+	train_op = optimizer.minimize(number_loss, var_list=var_list)
+	reset_opt_op = tf.variables_initializer([optimizer.get_slot(var, name) for name in optimizer.get_slot_names() for var in var_list])
+	sess.run(reset_opt_op)
 
 	for _type in ['training', 'validation']:
 		new_qa = []
@@ -107,7 +110,7 @@ def main():
 				new_qa.append(q)
 		qa_data[_type] = new_qa
 
-	init_new_vars_op = tf.initialize_variables([optimizer, ans_number_W, ans_number_b])
+	init_new_vars_op = tf.initialize_variables([ans_number_W, ans_number_b])
 	sess.run(init_new_vars_op)
 	for i in xrange(args.epochs):
 		batch_no = 0
