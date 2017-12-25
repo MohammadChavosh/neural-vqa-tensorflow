@@ -4,22 +4,7 @@ import data_loader
 import argparse
 import numpy as np
 import json
-
-
-def init_weight(dim_in, dim_out, name=None, stddev=1.0):
-	return tf.Variable(tf.truncated_normal([dim_in, dim_out], stddev=stddev/math.sqrt(float(dim_in))), name=name)
-
-
-def init_bias(dim_out, name=None):
-	return tf.Variable(tf.zeros([dim_out]), name=name)
-
-
-def index1dTrue(t):
-	return tf.reduce_min(tf.where(tf.equal(t, True)))
-
-
-def index1dOne(t):
-	return tf.reduce_min(tf.where(tf.equal(t, 1.0)))
+from train_numbers import init_weight, init_bias, index1dTrue
 
 
 def main():
