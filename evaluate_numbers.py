@@ -72,8 +72,6 @@ def main():
 	for i in xrange(len(image_id_list)):
 		image_id_map[ image_id_list[i] ] = i
 
-	ans_map = { qa_data['answer_vocab'][ans] : ans for ans in qa_data['answer_vocab']}
-
 	model_options = {
 		'num_lstm_layers' : args.num_lstm_layers,
 		'rnn_size' : args.rnn_size,
@@ -121,7 +119,7 @@ def main():
 		if args.debug:
 			for idx, p in enumerate(pred):
 				# print ans_map[p], ans_map[ np.argmax(answer[idx])]
-				result.append({'answer': ans_map[p], 'question_id': question_ids[cnt]})
+				result.append({'answer': str(p), 'question_id': question_ids[cnt]})
 				cnt += 1
 
 		correct_predictions = np.equal(pred, np.argmax(answer, 1))
