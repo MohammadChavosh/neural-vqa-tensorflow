@@ -13,14 +13,14 @@ def load_number_questions_answers(version=2, data_dir='Data'):
 
 		v_q_json_file = join(data_dir, 'MultipleChoice_mscoco_val2014_questions.json')
 		v_a_json_file = join(data_dir, 'mscoco_val2014_annotations.json')
-		vocab_file = join(data_dir, 'vocab_file1.pkl')
+		vocab_file = join(data_dir, 'number_vocab_file1.pkl')
 	else:
 		t_q_json_file = join(data_dir, 'v2_OpenEnded_mscoco_train2014_questions.json')
 		t_a_json_file = join(data_dir, 'v2_mscoco_train2014_annotations.json')
 
 		v_q_json_file = join(data_dir, 'v2_OpenEnded_mscoco_val2014_questions.json')
 		v_a_json_file = join(data_dir, 'v2_mscoco_val2014_annotations.json')
-		vocab_file = join(data_dir, 'vocab_file2.pkl')
+		vocab_file = join(data_dir, 'number_vocab_file2.pkl')
 
 	# IF ALREADY EXTRACTED
 	qa_data_file = join(data_dir, 'number_qa_data_file{}.pkl'.format(version))
@@ -51,8 +51,7 @@ def load_number_questions_answers(version=2, data_dir='Data'):
 	answers = t_answers['annotations'] + v_answers['annotations']
 	questions = t_questions['questions'] + v_questions['questions']
 
-	answer_vocab = make_answer_vocab(answers)
-	question_vocab, max_question_length = make_questions_vocab(questions, answers, answer_vocab)
+	question_vocab, max_question_length = make_number_questions_vocab(questions, answers)
 	print "Max Question Length", max_question_length
 	word_regex = re.compile(r'\w+')
 	training_data = []
@@ -93,7 +92,6 @@ def load_number_questions_answers(version=2, data_dir='Data'):
 	data = {
 		'training': training_data,
 		'validation': val_data,
-		'answer_vocab': answer_vocab,
 		'question_vocab': question_vocab,
 		'max_question_length': max_question_length
 	}
@@ -104,7 +102,6 @@ def load_number_questions_answers(version=2, data_dir='Data'):
 
 	with open(vocab_file, 'wb') as f:
 		vocab_data = {
-			'answer_vocab': data['answer_vocab'],
 			'question_vocab': data['question_vocab'],
 			'max_question_length': data['max_question_length']
 		}
@@ -252,6 +249,44 @@ def make_answer_vocab(answers):
 
 	answer_vocab['UNK'] = top_n - 1
 	return answer_vocab
+
+
+def make_number_questions_vocab(questions, answers):
+	word_regex = re.compile(r'\w+')
+	question_frequency = {}
+
+	max_question_length = 0
+	for i, question in enumerate(questions):
+		count = 0
+		if answers[i]['answer_type'] == 'number':
+			question_words = re.findall(word_regex, question['question'])
+			for qw in question_words:
+				if qw in question_frequency:
+					question_frequency[qw] += 1
+				else:
+					question_frequency[qw] = 1
+				count += 1
+		if count > max_question_length:
+			max_question_length = count
+
+	qw_freq_threhold = 0
+	qw_tuples = [(-frequency, qw) for qw, frequency in question_frequency.iteritems()]
+	# qw_tuples.sort()
+
+	qw_vocab = {}
+	for i, qw_freq in enumerate(qw_tuples):
+		frequency = -qw_freq[0]
+		qw = qw_freq[1]
+		# print frequency, qw
+		if frequency > qw_freq_threhold:
+			# +1 for accounting the zero padding for batc training
+			qw_vocab[qw] = i + 1
+		else:
+			break
+
+	qw_vocab['UNK'] = len(qw_vocab) + 1
+
+	return qw_vocab, max_question_length
 
 
 def make_questions_vocab(questions, answers, answer_vocab):
