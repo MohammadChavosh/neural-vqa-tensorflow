@@ -46,6 +46,13 @@ def main():
 	print "Reading QA DATA"
 	qa_data = data_loader.load_questions_answers(args.version, args.data_dir, True)
 
+	for _type in ['training', 'validation']:
+		new_qa = []
+		for q in qa_data[_type]:
+			if q['answer_type'] == 'number':
+				new_qa.append(q)
+		qa_data[_type] = new_qa
+
 	print "Reading fc7 features"
 	fc7_features, image_id_list = data_loader.load_fc7_features(args.data_dir, 'train')
 	print "FC7 features", fc7_features.shape
@@ -54,13 +61,6 @@ def main():
 	image_id_map = {}
 	for i in xrange(len(image_id_list)):
 		image_id_map[ image_id_list[i] ] = i
-
-	for _type in ['training', 'validation']:
-		new_qa = []
-		for q in qa_data[_type]:
-			if q['answer_type'] == 'number' and q['image_id'] in image_id_map:
-				new_qa.append(q)
-		qa_data[_type] = new_qa
 
 	ans_map = {qa_data['answer_vocab'][ans]: ans for ans in qa_data['answer_vocab']}
 

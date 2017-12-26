@@ -91,10 +91,7 @@ def load_questions_answers(version=2, data_dir='Data', load_numbers=True):
 
 			base = max_question_length - len(question_words)
 			for i in range(0, len(question_words)):
-				if question_words[i] not in question_vocab:
-					training_data[-1]['question'][base + i] = question_vocab['UNK']
-				else:
-					training_data[-1]['question'][base + i] = question_vocab[question_words[i]]
+				training_data[-1]['question'][base + i] = question_vocab[question_words[i]]
 
 	print "Training Data", len(training_data)
 	val_data = []
@@ -123,10 +120,7 @@ def load_questions_answers(version=2, data_dir='Data', load_numbers=True):
 
 			base = max_question_length - len(question_words)
 			for i in range(0, len(question_words)):
-				if question_words[i] not in question_vocab:
-					val_data[-1]['question'][base + i] = question_vocab['UNK']
-				else:
-					val_data[-1]['question'][base + i] = question_vocab[question_words[i]]
+				val_data[-1]['question'][base + i] = question_vocab[question_words[i]]
 
 	print "Validation Data", len(val_data)
 
