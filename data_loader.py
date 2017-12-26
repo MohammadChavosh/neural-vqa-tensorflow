@@ -6,7 +6,7 @@ import pickle
 import random
 
 
-def load_questions_answers(version=2, data_dir='Data', load_numbers=False):
+def load_questions_answers(version=2, data_dir='Data', load_numbers=True):
 	if version == 1:
 		t_q_json_file = join(data_dir, 'MultipleChoice_mscoco_train2014_questions.json')
 		t_a_json_file = join(data_dir, 'mscoco_train2014_annotations.json')
@@ -62,7 +62,7 @@ def load_questions_answers(version=2, data_dir='Data', load_numbers=False):
 	questions = t_questions['questions'] + v_questions['questions']
 
 	answer_vocab = make_answer_vocab(answers)
-	question_vocab, max_question_length = make_questions_vocab(questions, answers, answer_vocab)
+	question_vocab, max_question_length = make_questions_vocab(questions, answers, answer_vocab, load_numbers)
 	print "Max Question Length", max_question_length
 	word_regex = re.compile(r'\w+')
 	training_data = []
@@ -84,6 +84,7 @@ def load_questions_answers(version=2, data_dir='Data', load_numbers=False):
 					'question_id': question['question_id'],
 					'question': np.zeros(max_question_length),
 					'answer_type': t_answers['annotations'][i]['answer_type'],
+					'answer': answer_vocab['UNK'],
 					'ans_str': ans
 				})
 			question_words = re.findall(word_regex, question['question'])
@@ -115,6 +116,7 @@ def load_questions_answers(version=2, data_dir='Data', load_numbers=False):
 					'question_id': question['question_id'],
 					'question': np.zeros(max_question_length),
 					'answer_type': v_answers['annotations'][i]['answer_type'],
+					'answer': answer_vocab['UNK'],
 					'ans_str': ans
 				})
 			question_words = re.findall(word_regex, question['question'])
@@ -181,7 +183,7 @@ def make_answer_vocab(answers):
 	return answer_vocab
 
 
-def make_questions_vocab(questions, answers, answer_vocab):
+def make_questions_vocab(questions, answers, answer_vocab, load_numbers):
 	word_regex = re.compile(r'\w+')
 	question_frequency = {}
 
@@ -189,7 +191,7 @@ def make_questions_vocab(questions, answers, answer_vocab):
 	for i, question in enumerate(questions):
 		ans = answers[i]['multiple_choice_answer']
 		count = 0
-		if ans in answer_vocab:
+		if (ans in answer_vocab) or (load_numbers and answers[i]['answer_type'] == 'number'):
 			question_words = re.findall(word_regex, question['question'])
 			for qw in question_words:
 				if qw in question_frequency:
