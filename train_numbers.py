@@ -89,10 +89,10 @@ def main():
 
 	answer_probability = tf.nn.sigmoid(number_logits, name='number_answer_probab')
 	tmp_indices = tf.where(tf.equal(tf.less(0.6, answer_probability), True))
-	number_prediction = tf.reduce_max(tmp_indices)
+	number_prediction = tf.segment_min(tmp_indices[:, 1], tmp_indices[:, 0])
 
 	ans_tmp_indices = tf.where(tf.equal(input_tensors['answer'], 1.0))
-	correct_ans = tf.reduce_max(ans_tmp_indices)
+	correct_ans = tf.segment_min(ans_tmp_indices[:, 1], ans_tmp_indices[:, 0])
 	correct_predictions = tf.equal(correct_ans, number_prediction)
 	number_accuracy = tf.reduce_mean(tf.cast(correct_predictions, tf.float32))
 
