@@ -79,7 +79,7 @@ def main():
 	number_logits = tf.matmul(lstm_answer, ans_number_W) + ans_number_b
 
 	ans_probability = tf.nn.sigmoid(number_logits, name='number_answer_probab')
-	answer_probability = ans_probability + tf.expand_dims(tf.maximum(0.60000001 - tf.reduce_max(ans_probability, axis=1), 0), 1)
+	answer_probability = ans_probability + tf.expand_dims(tf.maximum(0.60000001 - tf.reduce_max(ans_probability, axis=0), 0), 0)
 	tmp_indices = tf.where(tf.equal(tf.less(0.6, answer_probability), True))
 	number_prediction = tf.segment_max(tmp_indices[:, 1], tmp_indices[:, 0])
 
