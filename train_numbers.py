@@ -117,13 +117,15 @@ def main():
 
 		while (batch_no*args.batch_size) < len(qa_data['training']):
 			sentence, answer, fc7 = get_training_batch(batch_no, args.batch_size, fc7_features, image_id_map, qa_data, 'train', ans_size)
-			_, loss_value, accuracy, pred = sess.run([train_op, number_loss, number_accuracy, number_prediction],
+			_, loss_value, accuracy, pred, ca = sess.run([train_op, number_loss, number_accuracy, number_prediction, correct_ans],
 				feed_dict={
 					input_tensors['fc7']:fc7,
 					input_tensors['sentence']:sentence,
 					input_tensors['answer']:answer
 				}
 			)
+			print "ca: ", ca
+			print "ans: ", answer
 			batch_no += 1
 			if args.debug:
 				for idx, p in enumerate(pred):
