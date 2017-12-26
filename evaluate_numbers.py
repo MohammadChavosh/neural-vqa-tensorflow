@@ -96,7 +96,7 @@ def main():
 		sentence, answer, fc7, question_ids = get_batch(batch_no, args.batch_size, 
 			fc7_features, image_id_map, qa_data, 'val')
 		
-		pred = sess.run([number_prediction], feed_dict={
+		pred = sess.run(number_prediction, feed_dict={
             input_tensors['fc7']:fc7,
             input_tensors['sentence']:sentence,
         })
