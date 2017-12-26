@@ -88,11 +88,12 @@ def main():
 	number_loss = tf.reduce_sum(number_ce, name='number_loss')
 
 	answer_probability = tf.nn.sigmoid(number_logits, name='number_answer_probab')
+	answer_probability = answer_probability + tf.maximum(0.6 - tf.reduce_max(answer_probability), 0)
 	tmp_indices = tf.where(tf.equal(tf.less(0.6, answer_probability), True))
-	number_prediction = tf.segment_min(tmp_indices[:, 1], tmp_indices[:, 0])
+	number_prediction = tf.segment_max(tmp_indices[:, 1], tmp_indices[:, 0])
 
 	ans_tmp_indices = tf.where(tf.equal(input_tensors['answer'], 1.0))
-	correct_ans = tf.segment_min(ans_tmp_indices[:, 1], ans_tmp_indices[:, 0])
+	correct_ans = tf.segment_max(ans_tmp_indices[:, 1], ans_tmp_indices[:, 0])
 	correct_predictions = tf.equal(correct_ans, number_prediction)
 	number_accuracy = tf.reduce_mean(tf.cast(correct_predictions, tf.float32))
 

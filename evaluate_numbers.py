@@ -79,8 +79,9 @@ def main():
 	number_logits = tf.matmul(lstm_answer, ans_number_W) + ans_number_b
 
 	answer_probability = tf.nn.sigmoid(number_logits, name='number_answer_probab')
+	answer_probability = answer_probability + tf.maximum(0.6 - tf.reduce_max(answer_probability), 0)
 	tmp_indices = tf.where(tf.equal(tf.less(0.6, answer_probability), True))
-	number_prediction = tf.reduce_max(tmp_indices)
+	number_prediction = tf.segment_max(tmp_indices[:, 1], tmp_indices[:, 0])
 
 	sess = tf.InteractiveSession()
 	saver = tf.train.Saver()
@@ -108,14 +109,13 @@ def main():
 				result.append({'answer': str(p), 'question_id': question_ids[cnt]})
 				cnt += 1
 
-		ans_tmp_indices = np.where(np.equal(answer, 1.0))
-		correct_ans = np.max(ans_tmp_indices)
+		correct_ans = np.shape(answer)[1] - np.argmax(answer[:, ::-1], axis=1) - 1
 		correct_predictions = np.equal(correct_ans, number_prediction)
 		accuracy = np.mean(np.cast(correct_predictions, tf.float32))
 		print "Acc", accuracy
 		avg_accuracy += accuracy
 		total += 1
-	
+
 	print "Acc", avg_accuracy/total
 	my_list = list(result)
 	json.dump(my_list,open('result.json','w'))
