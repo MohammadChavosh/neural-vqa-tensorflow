@@ -1,25 +1,11 @@
-from env import Environment
-import random
+import tensorflow as tf
 
+val = 3
+m = tf.placeholder(tf.int32)
+m_feed = [val, 0, val, 0, val]
 
-def main():
-	environment = Environment()
-	print environment.latest_loss, environment.latest_accuracy
-	print environment.crop_coordinates
-	print '--------------------'
-	for _ in range(10):
-		valid_actions = environment.valid_actions()
-		print 'valid_actions: ', valid_actions
-		action = random.sample(valid_actions, 1)[0]
-		print 'action: ', action
-		print 'reward, done: ', environment.action(action)
-		print 'coordinates: ', environment.crop_coordinates
-		print 'latest_loss: ', environment.latest_loss
-		print 'latest_accuracy: ', environment.latest_accuracy
-		print '----------------------'
-		with open("test.txt", "a") as f:
-				f.write('salam\n')
+tmp_indices = tf.where(tf.equal(tf.less(2, m), True))
+result = tf.reduce_min(tmp_indices)
 
-
-if __name__ == '__main__':
-	main()
+with tf.Session() as sess:
+    print(sess.run([result, tmp_indices], feed_dict={m: m_feed}))  # [2, 0, 1]

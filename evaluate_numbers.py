@@ -79,8 +79,8 @@ def main():
 	number_logits = tf.matmul(lstm_answer, ans_number_W) + ans_number_b
 
 	answer_probability = tf.nn.sigmoid(number_logits, name='number_answer_probab')
-	tmp_indices = tf.equal(tf.less(0.6, answer_probability), True)
-	number_prediction = tf.map_fn(index1dTrue, tmp_indices, dtype=tf.int64)
+	tmp_indices = tf.where(tf.equal(tf.less(0.6, answer_probability), True))
+	number_prediction = tf.reduce_max(tmp_indices)
 
 	sess = tf.InteractiveSession()
 	saver = tf.train.Saver()
@@ -108,7 +108,9 @@ def main():
 				result.append({'answer': str(p), 'question_id': question_ids[cnt]})
 				cnt += 1
 
-		correct_predictions = np.equal(pred, np.argmax(answer, 1))
+		ans_tmp_indices = tf.where(tf.equal(input_tensors['answer'], 1.0))
+		correct_ans = tf.reduce_max(ans_tmp_indices)
+		correct_predictions = tf.equal(correct_ans, number_prediction)
 		correct_predictions = correct_predictions.astype('float32')
 		accuracy = correct_predictions.mean()
 		print "Acc", accuracy

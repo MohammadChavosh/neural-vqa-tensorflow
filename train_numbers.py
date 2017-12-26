@@ -13,15 +13,6 @@ def init_weight(dim_in, dim_out, name=None, stddev=1.0):
 def init_bias(dim_out, name=None):
 	return tf.Variable(tf.zeros([dim_out]), name=name)
 
-
-def index1dTrue(t):
-	return tf.reduce_min(tf.where(tf.equal(t, True)))
-
-
-def index1dOne(t):
-	return tf.reduce_min(tf.where(tf.equal(t, 1.0)))
-
-
 def main():
 	parser = argparse.ArgumentParser()
 	parser.add_argument('--num_lstm_layers', type=int, default=2,
@@ -97,10 +88,11 @@ def main():
 	number_loss = tf.reduce_sum(number_ce, name='number_loss')
 
 	answer_probability = tf.nn.sigmoid(number_logits, name='number_answer_probab')
-	tmp_indices = tf.equal(tf.less(0.6, answer_probability), True)
-	number_prediction = tf.map_fn(index1dTrue, tmp_indices, dtype=tf.int64)
+	tmp_indices = tf.where(tf.equal(tf.less(0.6, answer_probability), True))
+	number_prediction = tf.reduce_max(tmp_indices)
 
-	correct_ans = tf.map_fn(index1dOne, input_tensors['answer'], dtype=tf.int64)
+	ans_tmp_indices = tf.where(tf.equal(input_tensors['answer'], 1.0))
+	correct_ans = tf.reduce_max(ans_tmp_indices)
 	correct_predictions = tf.equal(correct_ans, number_prediction)
 	number_accuracy = tf.reduce_mean(tf.cast(correct_predictions, tf.float32))
 
