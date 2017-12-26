@@ -111,8 +111,7 @@ def main():
 		ans_tmp_indices = tf.where(tf.equal(answer, 1.0))
 		correct_ans = tf.reduce_max(ans_tmp_indices)
 		correct_predictions = tf.equal(correct_ans, number_prediction)
-		correct_predictions = correct_predictions.astype('float32')
-		accuracy = correct_predictions.mean()
+		accuracy = tf.reduce_mean(tf.cast(correct_predictions, tf.float32))
 		print "Acc", accuracy
 		avg_accuracy += accuracy
 		total += 1
