@@ -55,8 +55,6 @@ def main():
 	for i in xrange(len(image_id_list)):
 		image_id_map[ image_id_list[i] ] = i
 
-	ans_map = {qa_data['answer_vocab'][ans]: ans for ans in qa_data['answer_vocab']}
-
 	model_options = {
 		'num_lstm_layers' : args.num_lstm_layers,
 		'rnn_size' : args.rnn_size,
@@ -120,8 +118,8 @@ def main():
 			)
 			batch_no += 1
 			if args.debug:
-				for idx, p in enumerate(pred):
-					print ans_map[p], ans_map[ np.argmax(answer[idx])]
+				# for idx, p in enumerate(pred):
+				# 	print ans_map[p], ans_map[ np.argmax(answer[idx])]
 
 				print "Loss", loss_value, batch_no, i
 				print "Accuracy", accuracy
