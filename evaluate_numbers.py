@@ -109,7 +109,7 @@ def main():
 				cnt += 1
 
 		ans_tmp_indices = np.where(np.equal(answer, 1.0))
-		correct_ans = np.reduce_max(ans_tmp_indices)
+		correct_ans = np.max(ans_tmp_indices)
 		correct_predictions = np.equal(correct_ans, number_prediction)
 		accuracy = tf.reduce_mean(np.cast(correct_predictions, tf.float32))
 		print "Acc", accuracy
