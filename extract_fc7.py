@@ -14,6 +14,7 @@ def main():
 	parser.add_argument('--model_path', type=str, default='Data/vgg16.tfmodel', help='Pretrained VGG16 Model')
 	parser.add_argument('--data_dir', type=str, default='Data', help='Data directory')
 	parser.add_argument('--batch_size', type=int, default=10, help='Batch Size')
+	parser.add_argument('--version', type=int, default=2, help='VQA data version')
 
 	args = parser.parse_args()
 
