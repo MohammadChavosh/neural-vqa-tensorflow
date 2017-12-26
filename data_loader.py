@@ -6,128 +6,34 @@ import pickle
 import random
 
 
-def load_number_questions_answers(version=2, data_dir='Data'):
+def load_questions_answers(version=2, data_dir='Data', load_numbers=False):
 	if version == 1:
 		t_q_json_file = join(data_dir, 'MultipleChoice_mscoco_train2014_questions.json')
 		t_a_json_file = join(data_dir, 'mscoco_train2014_annotations.json')
 
 		v_q_json_file = join(data_dir, 'MultipleChoice_mscoco_val2014_questions.json')
 		v_a_json_file = join(data_dir, 'mscoco_val2014_annotations.json')
-		vocab_file = join(data_dir, 'number_vocab_file1.pkl')
+		if load_numbers:
+			vocab_file = join(data_dir, 'number_vocab_file1.pkl')
+		else:
+			vocab_file = join(data_dir, 'vocab_file1.pkl')
 	else:
 		t_q_json_file = join(data_dir, 'v2_OpenEnded_mscoco_train2014_questions.json')
 		t_a_json_file = join(data_dir, 'v2_mscoco_train2014_annotations.json')
 
 		v_q_json_file = join(data_dir, 'v2_OpenEnded_mscoco_val2014_questions.json')
 		v_a_json_file = join(data_dir, 'v2_mscoco_val2014_annotations.json')
-		vocab_file = join(data_dir, 'number_vocab_file2.pkl')
+		if load_numbers:
+			vocab_file = join(data_dir, 'number_vocab_file2.pkl')
+		else:
+			vocab_file = join(data_dir, 'vocab_file2.pkl')
 
 	# IF ALREADY EXTRACTED
-	qa_data_file = join(data_dir, 'number_qa_data_file{}.pkl'.format(version))
-	if isfile(qa_data_file):
-		with open(qa_data_file) as f:
-			data = pickle.load(f)
-			return data
-
-	print "Loading Training questions"
-	with open(t_q_json_file) as f:
-		t_questions = json.loads(f.read())
-
-	print "Loading Training anwers"
-	with open(t_a_json_file) as f:
-		t_answers = json.loads(f.read())
-
-	print "Loading Val questions"
-	with open(v_q_json_file) as f:
-		v_questions = json.loads(f.read())
-
-	print "Loading Val answers"
-	with open(v_a_json_file) as f:
-		v_answers = json.loads(f.read())
-
-	print "Ans", len(t_answers['annotations']), len(v_answers['annotations'])
-	print "Qu", len(t_questions['questions']), len(v_questions['questions'])
-
-	answers = t_answers['annotations'] + v_answers['annotations']
-	questions = t_questions['questions'] + v_questions['questions']
-
-	question_vocab, max_question_length = make_number_questions_vocab(questions, answers)
-	print "Max Question Length", max_question_length
-	word_regex = re.compile(r'\w+')
-	training_data = []
-	for i, question in enumerate(t_questions['questions']):
-		ans = t_answers['annotations'][i]['multiple_choice_answer']
-		if t_answers['annotations'][i]['answer_type'] == 'number':
-			training_data.append({
-				'image_id': t_answers['annotations'][i]['image_id'],
-				'question_id': question['question_id'],
-				'question': np.zeros(max_question_length),
-				'ans_str': ans
-			})
-			question_words = re.findall(word_regex, question['question'])
-
-			base = max_question_length - len(question_words)
-			for i in range(0, len(question_words)):
-				training_data[-1]['question'][base + i] = question_vocab[question_words[i]]
-
-	print "Training Data", len(training_data)
-	val_data = []
-	for i, question in enumerate(v_questions['questions']):
-		ans = v_answers['annotations'][i]['multiple_choice_answer']
-		if v_answers['annotations'][i]['answer_type'] == 'number':
-			val_data.append({
-				'image_id': v_answers['annotations'][i]['image_id'],
-				'question_id': question['question_id'],
-				'question': np.zeros(max_question_length),
-				'ans_str': ans
-			})
-			question_words = re.findall(word_regex, question['question'])
-
-			base = max_question_length - len(question_words)
-			for i in range(0, len(question_words)):
-				val_data[-1]['question'][base + i] = question_vocab[question_words[i]]
-
-	print "Validation Data", len(val_data)
-
-	data = {
-		'training': training_data,
-		'validation': val_data,
-		'question_vocab': question_vocab,
-		'max_question_length': max_question_length
-	}
-
-	print "Saving qa_data"
-	with open(qa_data_file, 'wb') as f:
-		pickle.dump(data, f)
-
-	with open(vocab_file, 'wb') as f:
-		vocab_data = {
-			'question_vocab': data['question_vocab'],
-			'max_question_length': data['max_question_length']
-		}
-		pickle.dump(vocab_data, f)
-
-	return data
-
-
-def load_questions_answers(version=2, data_dir='Data'):
-	if version == 1:
-		t_q_json_file = join(data_dir, 'MultipleChoice_mscoco_train2014_questions.json')
-		t_a_json_file = join(data_dir, 'mscoco_train2014_annotations.json')
-
-		v_q_json_file = join(data_dir, 'MultipleChoice_mscoco_val2014_questions.json')
-		v_a_json_file = join(data_dir, 'mscoco_val2014_annotations.json')
-		vocab_file = join(data_dir, 'vocab_file1.pkl')
+	if load_numbers:
+		qa_data_file = join(data_dir, 'number_qa_data_file{}.pkl'.format(version))
 	else:
-		t_q_json_file = join(data_dir, 'v2_OpenEnded_mscoco_train2014_questions.json')
-		t_a_json_file = join(data_dir, 'v2_mscoco_train2014_annotations.json')
+		qa_data_file = join(data_dir, 'qa_data_file{}.pkl'.format(version))
 
-		v_q_json_file = join(data_dir, 'v2_OpenEnded_mscoco_val2014_questions.json')
-		v_a_json_file = join(data_dir, 'v2_mscoco_val2014_annotations.json')
-		vocab_file = join(data_dir, 'vocab_file2.pkl')
-
-	# IF ALREADY EXTRACTED
-	qa_data_file = join(data_dir, 'qa_data_file{}.pkl'.format(version))
 	if isfile(qa_data_file):
 		with open(qa_data_file) as f:
 			data = pickle.load(f)
@@ -156,13 +62,13 @@ def load_questions_answers(version=2, data_dir='Data'):
 	questions = t_questions['questions'] + v_questions['questions']
 
 	answer_vocab = make_answer_vocab(answers)
-	question_vocab, max_question_length = make_questions_vocab(questions, answers, answer_vocab)
+	question_vocab, max_question_length = make_questions_vocab(questions, answers, answer_vocab, load_numbers)
 	print "Max Question Length", max_question_length
 	word_regex = re.compile(r'\w+')
 	training_data = []
 	for i, question in enumerate(t_questions['questions']):
 		ans = t_answers['annotations'][i]['multiple_choice_answer']
-		if ans in answer_vocab:
+		if (ans in answer_vocab) or (load_numbers and t_answers['annotations'][i]['answer_type'] == 'number'):
 			training_data.append({
 				'image_id': t_answers['annotations'][i]['image_id'],
 				'question_id': question['question_id'],
@@ -181,7 +87,7 @@ def load_questions_answers(version=2, data_dir='Data'):
 	val_data = []
 	for i, question in enumerate(v_questions['questions']):
 		ans = v_answers['annotations'][i]['multiple_choice_answer']
-		if ans in answer_vocab:
+		if (ans in answer_vocab) or (load_numbers and v_answers['annotations'][i]['answer_type'] == 'number'):
 			val_data.append({
 				'image_id': v_answers['annotations'][i]['image_id'],
 				'question_id': question['question_id'],
@@ -251,45 +157,7 @@ def make_answer_vocab(answers):
 	return answer_vocab
 
 
-def make_number_questions_vocab(questions, answers):
-	word_regex = re.compile(r'\w+')
-	question_frequency = {}
-
-	max_question_length = 0
-	for i, question in enumerate(questions):
-		count = 0
-		if answers[i]['answer_type'] == 'number':
-			question_words = re.findall(word_regex, question['question'])
-			for qw in question_words:
-				if qw in question_frequency:
-					question_frequency[qw] += 1
-				else:
-					question_frequency[qw] = 1
-				count += 1
-		if count > max_question_length:
-			max_question_length = count
-
-	qw_freq_threhold = 0
-	qw_tuples = [(-frequency, qw) for qw, frequency in question_frequency.iteritems()]
-	# qw_tuples.sort()
-
-	qw_vocab = {}
-	for i, qw_freq in enumerate(qw_tuples):
-		frequency = -qw_freq[0]
-		qw = qw_freq[1]
-		# print frequency, qw
-		if frequency > qw_freq_threhold:
-			# +1 for accounting the zero padding for batc training
-			qw_vocab[qw] = i + 1
-		else:
-			break
-
-	qw_vocab['UNK'] = len(qw_vocab) + 1
-
-	return qw_vocab, max_question_length
-
-
-def make_questions_vocab(questions, answers, answer_vocab):
+def make_questions_vocab(questions, answers, answer_vocab, load_numbers):
 	word_regex = re.compile(r'\w+')
 	question_frequency = {}
 
@@ -297,7 +165,7 @@ def make_questions_vocab(questions, answers, answer_vocab):
 	for i, question in enumerate(questions):
 		ans = answers[i]['multiple_choice_answer']
 		count = 0
-		if ans in answer_vocab:
+		if (ans in answer_vocab) or (load_numbers and answers[i]['answer_type'] == 'number'):
 			question_words = re.findall(word_regex, question['question'])
 			for qw in question_words:
 				if qw in question_frequency:

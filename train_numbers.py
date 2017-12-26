@@ -44,7 +44,14 @@ def main():
 
 	args = parser.parse_args()
 	print "Reading QA DATA"
-	qa_data = data_loader.load_number_questions_answers(args.version, args.data_dir)
+	qa_data = data_loader.load_questions_answers(args.version, args.data_dir, True)
+
+	for _type in ['training', 'validation']:
+		new_qa = []
+		for q in qa_data[_type]:
+			if q['answer_type'] == 'number':
+				new_qa.append(q)
+		qa_data[_type] = new_qa
 	
 	print "Reading fc7 features"
 	fc7_features, image_id_list = data_loader.load_fc7_features(args.data_dir, 'train')
@@ -55,6 +62,8 @@ def main():
 	for i in xrange(len(image_id_list)):
 		image_id_map[ image_id_list[i] ] = i
 
+	ans_map = {qa_data['answer_vocab'][ans]: ans for ans in qa_data['answer_vocab']}
+
 	model_options = {
 		'num_lstm_layers' : args.num_lstm_layers,
 		'rnn_size' : args.rnn_size,
@@ -64,8 +73,7 @@ def main():
 		'fc7_feature_length' : args.fc7_feature_length,
 		'lstm_steps' : qa_data['max_question_length'] + 1,
 		'q_vocab_size' : len(qa_data['question_vocab']),
-		# 'ans_vocab_size' : len(qa_data['answer_vocab'])
-		'ans_vocab_size': 1000
+		'ans_vocab_size' : len(qa_data['answer_vocab'])
 	}
 
 	ans_size = 22
@@ -119,8 +127,8 @@ def main():
 			)
 			batch_no += 1
 			if args.debug:
-				# for idx, p in enumerate(pred):
-				# 	print ans_map[p], ans_map[ np.argmax(answer[idx])]
+				for idx, p in enumerate(pred):
+					print ans_map[p], ans_map[ np.argmax(answer[idx])]
 
 				print "Loss", loss_value, batch_no, i
 				print "Accuracy", accuracy
