@@ -108,7 +108,7 @@ def main():
 				result.append({'answer': str(p), 'question_id': question_ids[cnt]})
 				cnt += 1
 
-		ans_tmp_indices = tf.where(tf.equal(input_tensors['answer'], 1.0))
+		ans_tmp_indices = tf.where(tf.equal(answer, 1.0))
 		correct_ans = tf.reduce_max(ans_tmp_indices)
 		correct_predictions = tf.equal(correct_ans, number_prediction)
 		correct_predictions = correct_predictions.astype('float32')
