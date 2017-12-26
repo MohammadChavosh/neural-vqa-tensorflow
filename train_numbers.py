@@ -118,11 +118,13 @@ def main():
 
 		while (batch_no*args.batch_size) < len(qa_data['training']):
 			sentence, answer, fc7 = get_training_batch(batch_no, args.batch_size, fc7_features, image_id_map, qa_data, 'train', ans_size)
-			print sess.run(tf.reduce_max(answer_probability, axis=1), feed_dict={
+			tt = sess.run(tmp_indices, feed_dict={
 					input_tensors['fc7']:fc7,
 					input_tensors['sentence']:sentence,
 					input_tensors['answer']:answer
 				})
+			for t in tt:
+				print t
 			_, loss_value, accuracy, pred = sess.run([train_op, number_loss, number_accuracy, number_prediction],
 				feed_dict={
 					input_tensors['fc7']:fc7,
