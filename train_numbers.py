@@ -64,7 +64,8 @@ def main():
 		'fc7_feature_length' : args.fc7_feature_length,
 		'lstm_steps' : qa_data['max_question_length'] + 1,
 		'q_vocab_size' : len(qa_data['question_vocab']),
-		'ans_vocab_size' : len(qa_data['answer_vocab'])
+		# 'ans_vocab_size' : len(qa_data['answer_vocab'])
+		'ans_vocab_size': 1000
 	}
 
 	ans_size = 22
