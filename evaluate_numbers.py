@@ -38,15 +38,7 @@ def main():
 
 	args = parser.parse_args()
 	print "Reading QA DATA"
-	# qa_data = data_loader.load_questions_answers(args)
-	qa_data = data_loader.load_questions_answers(args.version, args.data_dir)
-
-	for _type in ['training', 'validation']:
-		new_qa = []
-		for q in qa_data[_type]:
-			if q['answer_type'] == 'number':
-				new_qa.append(q)
-		qa_data[_type] = new_qa
+	qa_data = data_loader.load_number_questions_answers(args.version, args.data_dir)
 
 	print "Reading fc7 features"
 	fc7_features, image_id_list = data_loader.load_fc7_features(args.data_dir, 'val')

@@ -44,7 +44,7 @@ def main():
 
 	args = parser.parse_args()
 	print "Reading QA DATA"
-	qa_data = data_loader.load_questions_answers(args.version, args.data_dir)
+	qa_data = data_loader.load_number_questions_answers(args.version, args.data_dir)
 	
 	print "Reading fc7 features"
 	fc7_features, image_id_list = data_loader.load_fc7_features(args.data_dir, 'train')
@@ -102,13 +102,6 @@ def main():
 	train_op = optimizer.minimize(number_loss, var_list=var_list)
 	reset_opt_op = tf.variables_initializer([optimizer.get_slot(var, name) for name in optimizer.get_slot_names() for var in var_list])
 	sess.run(reset_opt_op)
-
-	for _type in ['training', 'validation']:
-		new_qa = []
-		for q in qa_data[_type]:
-			if q['answer_type'] == 'number':
-				new_qa.append(q)
-		qa_data[_type] = new_qa
 
 	init_new_vars_op = tf.initialize_variables([ans_number_W, ans_number_b])
 	sess.run(init_new_vars_op)

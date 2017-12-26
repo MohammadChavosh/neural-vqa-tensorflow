@@ -6,6 +6,115 @@ import pickle
 import random
 
 
+def load_number_questions_answers(version=2, data_dir='Data'):
+	if version == 1:
+		t_q_json_file = join(data_dir, 'MultipleChoice_mscoco_train2014_questions.json')
+		t_a_json_file = join(data_dir, 'mscoco_train2014_annotations.json')
+
+		v_q_json_file = join(data_dir, 'MultipleChoice_mscoco_val2014_questions.json')
+		v_a_json_file = join(data_dir, 'mscoco_val2014_annotations.json')
+		vocab_file = join(data_dir, 'vocab_file1.pkl')
+	else:
+		t_q_json_file = join(data_dir, 'v2_OpenEnded_mscoco_train2014_questions.json')
+		t_a_json_file = join(data_dir, 'v2_mscoco_train2014_annotations.json')
+
+		v_q_json_file = join(data_dir, 'v2_OpenEnded_mscoco_val2014_questions.json')
+		v_a_json_file = join(data_dir, 'v2_mscoco_val2014_annotations.json')
+		vocab_file = join(data_dir, 'vocab_file2.pkl')
+
+	# IF ALREADY EXTRACTED
+	qa_data_file = join(data_dir, 'number_qa_data_file{}.pkl'.format(version))
+	if isfile(qa_data_file):
+		with open(qa_data_file) as f:
+			data = pickle.load(f)
+			return data
+
+	print "Loading Training questions"
+	with open(t_q_json_file) as f:
+		t_questions = json.loads(f.read())
+
+	print "Loading Training anwers"
+	with open(t_a_json_file) as f:
+		t_answers = json.loads(f.read())
+
+	print "Loading Val questions"
+	with open(v_q_json_file) as f:
+		v_questions = json.loads(f.read())
+
+	print "Loading Val answers"
+	with open(v_a_json_file) as f:
+		v_answers = json.loads(f.read())
+
+	print "Ans", len(t_answers['annotations']), len(v_answers['annotations'])
+	print "Qu", len(t_questions['questions']), len(v_questions['questions'])
+
+	answers = t_answers['annotations'] + v_answers['annotations']
+	questions = t_questions['questions'] + v_questions['questions']
+
+	answer_vocab = make_answer_vocab(answers)
+	question_vocab, max_question_length = make_questions_vocab(questions, answers, answer_vocab)
+	print "Max Question Length", max_question_length
+	word_regex = re.compile(r'\w+')
+	training_data = []
+	for i, question in enumerate(t_questions['questions']):
+		ans = t_answers['annotations'][i]['multiple_choice_answer']
+		if t_answers['annotations'][i]['answer_type'] == 'number':
+			training_data.append({
+				'image_id': t_answers['annotations'][i]['image_id'],
+				'question_id': question['question_id'],
+				'question': np.zeros(max_question_length),
+				'answer': answer_vocab[ans],
+				'ans_str': ans
+			})
+			question_words = re.findall(word_regex, question['question'])
+
+			base = max_question_length - len(question_words)
+			for i in range(0, len(question_words)):
+				training_data[-1]['question'][base + i] = question_vocab[question_words[i]]
+
+	print "Training Data", len(training_data)
+	val_data = []
+	for i, question in enumerate(v_questions['questions']):
+		ans = v_answers['annotations'][i]['multiple_choice_answer']
+		if t_answers['annotations'][i]['answer_type'] == 'number':
+			val_data.append({
+				'image_id': v_answers['annotations'][i]['image_id'],
+				'question_id': question['question_id'],
+				'question': np.zeros(max_question_length),
+				'answer': answer_vocab[ans],
+				'ans_str': ans
+			})
+			question_words = re.findall(word_regex, question['question'])
+
+			base = max_question_length - len(question_words)
+			for i in range(0, len(question_words)):
+				val_data[-1]['question'][base + i] = question_vocab[question_words[i]]
+
+	print "Validation Data", len(val_data)
+
+	data = {
+		'training': training_data,
+		'validation': val_data,
+		'answer_vocab': answer_vocab,
+		'question_vocab': question_vocab,
+		'max_question_length': max_question_length
+	}
+
+	print "Saving qa_data"
+	with open(qa_data_file, 'wb') as f:
+		pickle.dump(data, f)
+
+	with open(vocab_file, 'wb') as f:
+		vocab_data = {
+			'answer_vocab': data['answer_vocab'],
+			'question_vocab': data['question_vocab'],
+			'max_question_length': data['max_question_length']
+		}
+		pickle.dump(vocab_data, f)
+
+	return data
+
+
 def load_questions_answers(version=2, data_dir='Data'):
 	if version == 1:
 		t_q_json_file = join(data_dir, 'MultipleChoice_mscoco_train2014_questions.json')
