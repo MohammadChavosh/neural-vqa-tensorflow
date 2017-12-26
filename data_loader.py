@@ -97,14 +97,23 @@ def load_questions_answers(version=2, data_dir='Data', load_numbers=False):
 	for i, question in enumerate(v_questions['questions']):
 		ans = v_answers['annotations'][i]['multiple_choice_answer']
 		if (ans in answer_vocab) or (load_numbers and v_answers['annotations'][i]['answer_type'] == 'number'):
-			val_data.append({
-				'image_id': v_answers['annotations'][i]['image_id'],
-				'question_id': question['question_id'],
-				'question': np.zeros(max_question_length),
-				'answer_type': v_answers['annotations'][i]['answer_type'],
-				'answer': answer_vocab[ans],
-				'ans_str': ans
-			})
+			if ans in answer_vocab:
+				val_data.append({
+					'image_id': v_answers['annotations'][i]['image_id'],
+					'question_id': question['question_id'],
+					'question': np.zeros(max_question_length),
+					'answer_type': v_answers['annotations'][i]['answer_type'],
+					'answer': answer_vocab[ans],
+					'ans_str': ans
+				})
+			else:
+				val_data.append({
+					'image_id': v_answers['annotations'][i]['image_id'],
+					'question_id': question['question_id'],
+					'question': np.zeros(max_question_length),
+					'answer_type': v_answers['annotations'][i]['answer_type'],
+					'ans_str': ans
+				})
 			question_words = re.findall(word_regex, question['question'])
 
 			base = max_question_length - len(question_words)
