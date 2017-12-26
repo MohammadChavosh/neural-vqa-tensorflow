@@ -88,7 +88,7 @@ def main():
 	number_loss = tf.reduce_sum(number_ce, name='number_loss')
 
 	answer_probability = tf.nn.sigmoid(number_logits, name='number_answer_probab')
-	answer_probability = answer_probability + tf.maximum(0.6 - tf.reduce_max(answer_probability), 0)
+	answer_probability = answer_probability + tf.maximum(0.60000001 - tf.reduce_max(answer_probability), 0)
 	tmp_indices = tf.where(tf.equal(tf.less(0.6, answer_probability), True))
 	number_prediction = tf.segment_max(tmp_indices[:, 1], tmp_indices[:, 0])
 
@@ -118,15 +118,13 @@ def main():
 
 		while (batch_no*args.batch_size) < len(qa_data['training']):
 			sentence, answer, fc7 = get_training_batch(batch_no, args.batch_size, fc7_features, image_id_map, qa_data, 'train', ans_size)
-			_, loss_value, accuracy, pred, ca = sess.run([train_op, number_loss, number_accuracy, number_prediction, correct_ans],
+			_, loss_value, accuracy, pred = sess.run([train_op, number_loss, number_accuracy, number_prediction],
 				feed_dict={
 					input_tensors['fc7']:fc7,
 					input_tensors['sentence']:sentence,
 					input_tensors['answer']:answer
 				}
 			)
-			print "ca: ", ca
-			print "ans: ", answer
 			batch_no += 1
 			if args.debug:
 				for idx, p in enumerate(pred):
