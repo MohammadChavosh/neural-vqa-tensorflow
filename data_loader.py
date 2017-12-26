@@ -74,7 +74,7 @@ def load_number_questions_answers(version=2, data_dir='Data'):
 	val_data = []
 	for i, question in enumerate(v_questions['questions']):
 		ans = v_answers['annotations'][i]['multiple_choice_answer']
-		if t_answers['annotations'][i]['answer_type'] == 'number':
+		if v_answers['annotations'][i]['answer_type'] == 'number':
 			val_data.append({
 				'image_id': v_answers['annotations'][i]['image_id'],
 				'question_id': question['question_id'],
