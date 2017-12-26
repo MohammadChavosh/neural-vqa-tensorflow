@@ -110,7 +110,7 @@ def main():
 				cnt += 1
 
 		correct_ans = np.shape(answer)[1] - np.argmax(answer[:, ::-1], axis=1) - 1
-		correct_predictions = np.equal(correct_ans, number_prediction)
+		correct_predictions = np.equal(correct_ans, pred)
 		correct_predictions = correct_predictions.astype('float32')
 		accuracy = correct_predictions.mean()
 		print "Acc", accuracy
