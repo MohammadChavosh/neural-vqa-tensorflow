@@ -87,8 +87,8 @@ def main():
 	number_ce = tf.nn.sigmoid_cross_entropy_with_logits(labels=input_tensors['answer'], logits=number_logits, name='number_ce')
 	number_loss = tf.reduce_sum(number_ce, name='number_loss')
 
-	answer_probability = tf.nn.sigmoid(number_logits, name='number_answer_probab')
-	answer_probability = answer_probability + tf.expand_dims(tf.maximum(0.60000001 - tf.reduce_max(answer_probability, axis=1), 0), 1)
+	ans_probability = tf.nn.sigmoid(number_logits, name='number_answer_probab')
+	answer_probability = ans_probability + tf.expand_dims(tf.maximum(0.60000001 - tf.reduce_max(ans_probability, axis=1), 0), 1)
 	tmp_indices = tf.where(tf.equal(tf.less(0.6, answer_probability), True))
 	number_prediction = tf.segment_max(tmp_indices[:, 1], tmp_indices[:, 0])
 
