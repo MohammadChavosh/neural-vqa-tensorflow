@@ -111,7 +111,8 @@ def main():
 
 		correct_ans = np.shape(answer)[1] - np.argmax(answer[:, ::-1], axis=1) - 1
 		correct_predictions = np.equal(correct_ans, number_prediction)
-		accuracy = np.mean(np.cast(correct_predictions, tf.float32))
+		correct_predictions = correct_predictions.astype('float32')
+		accuracy = correct_predictions.mean()
 		print "Acc", accuracy
 		avg_accuracy += accuracy
 		total += 1
