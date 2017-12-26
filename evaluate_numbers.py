@@ -4,7 +4,7 @@ import data_loader
 import argparse
 import numpy as np
 import json
-from train_numbers import init_weight, init_bias, index1dTrue
+from train_numbers import init_weight, init_bias
 
 
 def main():
