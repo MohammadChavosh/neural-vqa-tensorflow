@@ -62,7 +62,7 @@ def load_questions_answers(version=2, data_dir='Data', load_numbers=False):
 	questions = t_questions['questions'] + v_questions['questions']
 
 	answer_vocab = make_answer_vocab(answers)
-	question_vocab, max_question_length = make_questions_vocab(questions, answers, answer_vocab, load_numbers)
+	question_vocab, max_question_length = make_questions_vocab(questions, answers, answer_vocab)
 	print "Max Question Length", max_question_length
 	word_regex = re.compile(r'\w+')
 	training_data = []
@@ -90,7 +90,10 @@ def load_questions_answers(version=2, data_dir='Data', load_numbers=False):
 
 			base = max_question_length - len(question_words)
 			for i in range(0, len(question_words)):
-				training_data[-1]['question'][base + i] = question_vocab[question_words[i]]
+				if question_words[i] not in question_vocab:
+					training_data[-1]['question'][base + i] = question_vocab['UNK']
+				else:
+					training_data[-1]['question'][base + i] = question_vocab[question_words[i]]
 
 	print "Training Data", len(training_data)
 	val_data = []
@@ -118,7 +121,10 @@ def load_questions_answers(version=2, data_dir='Data', load_numbers=False):
 
 			base = max_question_length - len(question_words)
 			for i in range(0, len(question_words)):
-				val_data[-1]['question'][base + i] = question_vocab[question_words[i]]
+				if question_words[i] not in question_vocab:
+					val_data[-1]['question'][base + i] = question_vocab['UNK']
+				else:
+					val_data[-1]['question'][base + i] = question_vocab[question_words[i]]
 
 	print "Validation Data", len(val_data)
 
@@ -175,7 +181,7 @@ def make_answer_vocab(answers):
 	return answer_vocab
 
 
-def make_questions_vocab(questions, answers, answer_vocab, load_numbers):
+def make_questions_vocab(questions, answers, answer_vocab):
 	word_regex = re.compile(r'\w+')
 	question_frequency = {}
 
@@ -183,7 +189,7 @@ def make_questions_vocab(questions, answers, answer_vocab, load_numbers):
 	for i, question in enumerate(questions):
 		ans = answers[i]['multiple_choice_answer']
 		count = 0
-		if (ans in answer_vocab) or (load_numbers and answers[i]['answer_type'] == 'number'):
+		if ans in answer_vocab:
 			question_words = re.findall(word_regex, question['question'])
 			for qw in question_words:
 				if qw in question_frequency:
