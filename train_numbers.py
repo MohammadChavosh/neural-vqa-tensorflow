@@ -115,7 +115,11 @@ def main():
 	saver = tf.train.Saver()
 	for i in xrange(args.epochs):
 		batch_no = 0
-
+		if batch_no == 2:
+			optimizer = tf.train.MomentumOptimizer(args.learning_rate, 0.95)
+			train_op = optimizer.minimize(number_loss)
+			momentum_initializers = [var.initializer for var in tf.global_variables() if 'Momentum' in var.name]
+			sess.run(momentum_initializers)
 		while (batch_no*args.batch_size) < len(qa_data['training']):
 			sentence, answer, fc7 = get_training_batch(batch_no, args.batch_size, fc7_features, image_id_map, qa_data, 'train', ans_size)
 			_, loss_value, accuracy, pred = sess.run([train_op, number_loss, number_accuracy, number_prediction],
