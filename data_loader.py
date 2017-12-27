@@ -68,7 +68,7 @@ def load_questions_answers(version=2, data_dir='Data', load_numbers=True):
 	training_data = []
 	for i, question in enumerate(t_questions['questions']):
 		ans = t_answers['annotations'][i]['multiple_choice_answer']
-		if (ans in answer_vocab) or (load_numbers and t_answers['annotations'][i]['answer_type'] == 'number'):
+		if (ans in answer_vocab) or (load_numbers and t_answers['annotations'][i]['answer_type'] == 'number' and ans.isdigit()):
 			if ans in answer_vocab:
 				training_data.append({
 					'image_id': t_answers['annotations'][i]['image_id'],
@@ -97,7 +97,7 @@ def load_questions_answers(version=2, data_dir='Data', load_numbers=True):
 	val_data = []
 	for i, question in enumerate(v_questions['questions']):
 		ans = v_answers['annotations'][i]['multiple_choice_answer']
-		if (ans in answer_vocab) or (load_numbers and v_answers['annotations'][i]['answer_type'] == 'number'):
+		if (ans in answer_vocab) or (load_numbers and v_answers['annotations'][i]['answer_type'] == 'number' and ans.isdigit()):
 			if ans in answer_vocab:
 				val_data.append({
 					'image_id': v_answers['annotations'][i]['image_id'],
@@ -185,7 +185,7 @@ def make_questions_vocab(questions, answers, answer_vocab, load_numbers):
 	for i, question in enumerate(questions):
 		ans = answers[i]['multiple_choice_answer']
 		count = 0
-		if (ans in answer_vocab) or (load_numbers and answers[i]['answer_type'] == 'number'):
+		if (ans in answer_vocab) or (load_numbers and answers[i]['answer_type'] == 'number' and ans.isdigit()):
 			question_words = re.findall(word_regex, question['question'])
 			for qw in question_words:
 				if qw in question_frequency:
