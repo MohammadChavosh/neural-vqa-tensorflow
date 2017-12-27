@@ -104,7 +104,7 @@ def main():
 	correct_predictions = tf.equal(correct_ans, number_prediction)
 	number_accuracy = tf.reduce_mean(tf.cast(correct_predictions, tf.float32))
 
-	optimizer = tf.train.MomentumOptimizer(args.learning_rate, 0.95)
+	optimizer = tf.train.MomentumOptimizer(args.learning_rate, 0.9)
 	var_list = [ans_number_W, ans_number_b]
 	train_op = optimizer.minimize(number_loss, var_list=var_list)
 	reset_opt_op = tf.variables_initializer([optimizer.get_slot(var, name) for name in optimizer.get_slot_names() for var in var_list])
@@ -115,8 +115,8 @@ def main():
 	saver = tf.train.Saver()
 	for i in xrange(args.epochs):
 		batch_no = 0
-		if batch_no == 2:
-			optimizer = tf.train.MomentumOptimizer(args.learning_rate, 0.95)
+		if batch_no == 3:
+			optimizer = tf.train.MomentumOptimizer(args.learning_rate, 0.9)
 			train_op = optimizer.minimize(number_loss)
 			momentum_initializers = [var.initializer for var in tf.global_variables() if 'Momentum' in var.name]
 			sess.run(momentum_initializers)
