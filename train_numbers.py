@@ -115,7 +115,7 @@ def main():
 	saver = tf.train.Saver()
 	for i in xrange(args.epochs):
 		batch_no = 0
-		if batch_no == 3:
+		if i == 3:
 			optimizer = tf.train.MomentumOptimizer(args.learning_rate, 0.9)
 			train_op = optimizer.minimize(number_loss)
 			momentum_initializers = [var.initializer for var in tf.global_variables() if 'Momentum' in var.name]
